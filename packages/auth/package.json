@@ -1,0 +1,15 @@
+{
+  "name": "@deliveringtogether/auth",
+  "version": "0.1.0",
+  "description": "Shared authentication utilities for DeliveringTogether applications",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "echo 'Building Auth package'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.31.0"
+  }
+}

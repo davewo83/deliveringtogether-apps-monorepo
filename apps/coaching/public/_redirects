@@ -1,0 +1,15 @@
+# API redirects (preserve these)
+/api/questions /.netlify/functions/fetch-questions 200!
+/api/categories /.netlify/functions/fetch-categories 200!
+
+# Remove the circular redirect
+# /coaching/* /:splat 200
+# Also remove the root redirect for now
+# / /coaching 302
+
+# Make sure API routes work from any path
+/coaching/api/questions /.netlify/functions/fetch-questions 200!
+/coaching/api/categories /.netlify/functions/fetch-categories 200!
+
+# Ensure SPA routing works
+/* /index.html 200

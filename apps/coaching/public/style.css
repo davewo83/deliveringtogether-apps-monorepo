@@ -1,0 +1,482 @@
+/* Modern CSS Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #111;
+  background-color: #ffffff;
+}
+
+/* Typography - with font display swap */
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #000;
+  font-display: swap;
+}
+
+h1 {
+  font-size: 2.25rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.5px;
+  font-weight: 800;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.3px;
+  font-weight: 600;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #444;
+}
+
+/* Layout - with prevent layout shift improvements */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  /* Reserve space to prevent layout shifts */
+  min-height: 80vh;
+  contain: layout style;
+}
+
+/* Header section stability */
+.page-title {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  color: #000;
+  /* Ensure stable height for title */
+  min-height: 3rem;
+}
+
+.page-subtitle {
+  margin-bottom: 2rem;
+  font-size: 1rem;
+  color: #666;
+  /* Ensure stable height for subtitle */
+  min-height: 1.5rem;
+}
+
+/* Filter bar - stabilized */
+.filter-bar-container {
+  position: relative;
+  margin-bottom: 2rem;
+  /* Reserve height for filter bar */
+  min-height: 50px;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  overflow-x: auto;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  scroll-behavior: smooth; 
+  -webkit-overflow-scrolling: touch;
+  /* Show scrollbar on desktop hover but hide on mobile */
+  scrollbar-width: thin;
+  /* Ensure minimum height to prevent layout shift */
+  min-height: 48px;
+}
+
+/* Filter placeholder to maintain layout before JS loads filters */
+.filter-placeholder {
+  height: 38px;
+  width: 300px; /* Approximate width of filter buttons */
+  background-color: #f5f5f5;
+  border-radius: 100px;
+  opacity: 0.3;
+}
+
+.filter-bar:has(> .filter-btn:nth-child(n+3)) .filter-placeholder {
+  display: none;
+}
+
+.filter-bar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.filter-bar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.filter-bar::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 10px;
+}
+
+.filter-bar::-webkit-scrollbar-thumb:hover {
+  background: #b1b1b1;
+}
+
+/* Scroll buttons for desktop */
+.scroll-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: white;
+  border: 1px solid #eee;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  font-size: 16px;
+  color: #555;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.scroll-btn:hover {
+  background: #f5f5f5;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+
+.scroll-btn.left {
+  left: 0;
+}
+
+.scroll-btn.right {
+  right: 0;
+}
+
+@media (max-width: 768px) {
+  .scroll-btn {
+    display: none; /* Hide scroll buttons on mobile */
+  }
+}
+
+.filter-btn {
+  padding: 0.6rem 1.2rem;
+  background-color: #f5f5f5;
+  color: #333;
+  border: none;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+  white-space: nowrap;
+  /* Fixed height to prevent layout shift */
+  height: 38px;
+}
+
+.filter-btn:hover {
+  background-color: #e5e5e5;
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background-color: #000;
+  color: #fff;
+}
+
+/* Results section with skeleton loader */
+#results {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  /* Reserve minimum height for results before they load */
+  min-height: 600px;
+}
+
+/* Skeleton loader for results */
+.skeleton-loader {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.skeleton-card {
+  height: 200px;
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 25%,
+    #f8f8f8 50%,
+    #f0f0f0 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 12px;
+  will-change: background-position;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Hide skeleton when actual questions load */
+#results:has(> .card) .skeleton-loader {
+  display: none;
+}
+
+/* Card design */
+.card {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+  border: 1px solid #f0f0f0;
+  /* Set fixed height to prevent layout shifts */
+  min-height: 180px;
+}
+
+.card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+.card-content {
+  padding: 1.5rem;
+}
+
+.card h2 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  margin-bottom: 1rem;
+  color: #000;
+  /* Ensure minimum height to prevent layout shifts */
+  min-height: 3rem;
+}
+
+.card .category {
+  display: inline-block;
+  padding: 0.4rem 0.8rem;
+  background-color: #f0f0f0;
+  color: #333;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 1rem;
+  /* Fixed height to prevent layout shifts */
+  height: 24px;
+}
+
+.details-container {
+  display: none;
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.details {
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #444;
+}
+
+.details strong {
+  color: #005a9e; /* Darker blue for better contrast (was #0077CC) */
+  font-weight: 600;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 0.25rem;
+}
+
+/* Button styles - adjusted to prevent layout shifts and improve contrast */
+.view-details-btn {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: #005a9e; /* Darker blue for better contrast (was #0077CC) */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  /* Fixed height to prevent layout shifts */
+  height: 42px;
+}
+
+.view-details-btn:hover {
+  background-color: #004b82; /* Darker blue for hover state (was #0066B3) */
+}
+
+/* Loading and error states */
+#loading {
+  text-align: center;
+  padding: 2rem;
+  font-weight: 500;
+  color: #666;
+}
+
+#error {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 2rem auto;
+  font-weight: 500;
+  max-width: 600px;
+  text-align: center;
+}
+
+#no-more-questions {
+  padding: 2rem 0;
+  text-align: center;
+  color: #595959; /* Darker for better contrast (was #777) */
+  font-weight: 500;
+  font-style: italic;
+}
+
+/* Sentinel for infinite scrolling */
+#sentinel {
+  height: 20px;
+  margin-top: 2rem;
+}
+
+/* Footer - Updated to prevent layout shifts and improve contrast */
+footer {
+  background-color: #ffffff;
+  color: #333;
+  padding: 3rem 0 1.5rem;
+  margin-top: 4rem;
+  border-top: 1px solid #f0f0f0;
+  /* Reserve minimum space for footer */
+  min-height: 300px;
+  /* Improve rendering performance */
+  content-visibility: auto;
+  contain-intrinsic-size: 0 300px;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  /* Set a specific height for each layout mode */
+  min-height: 200px;
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.footer-section {
+  margin-bottom: 1.5rem;
+  /* Reserve space for content */
+  min-height: 150px;
+}
+
+.footer-section h3 {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  color: #000000; /* Ensuring maximum contrast */
+  position: relative;
+  padding-bottom: 0.5rem;
+  /* Reserve space for the text */
+  min-height: 1.8rem;
+  font-weight: 700; /* Ensuring good weight for visibility */
+}
+
+.footer-section h3:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background-color: #005a9e; /* Darker blue for better contrast (was #0077CC) */
+}
+
+.footer-section p {
+  margin-bottom: 1rem;
+  color: #444; /* Darker for better contrast (was #555) */
+  line-height: 1.6;
+  /* Minimum height for paragraph */
+  min-height: 3.2rem;
+}
+
+.blog-link, .article-link {
+  display: inline-block;
+  color: #005a9e; /* Darker blue for better contrast (was #0077CC) */
+  text-decoration: none;
+  font-weight: 600; /* Increased from 500 for better visibility */
+  transition: color 0.2s ease, background-color 0.2s ease;
+  padding: 0.5rem 1rem;
+  background-color: rgba(0, 119, 204, 0.2); /* Slightly darker background */
+  border-radius: 4px;
+  margin-top: 0.5rem;
+  /* Using box-shadow instead of transform to avoid layout shifts */
+  box-shadow: 0 0 0 transparent;
+}
+
+.blog-link:hover, .article-link:hover {
+  color: white;
+  background-color: #005a9e; /* Darker blue for better contrast (was #0077CC) */
+  /* Use box-shadow instead of transform to avoid layout shifts */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.footer-bottom {
+  text-align: center;
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+  border-top: 1px solid #f0f0f0;
+}
+
+.footer-bottom p {
+  font-size: 0.9rem;
+  color: #595959; /* Darker for better contrast (was #777) */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  #results {
+    grid-template-columns: 1fr;
+  }
+  
+  h1 {
+    font-size: 1.75rem;
+  }
+  
+  .filter-bar {
+    padding-bottom: 1rem;
+  }
+}
+
+/* Fix for possible empty results container */
+#results:empty:not(:has(.skeleton-loader)) {
+  min-height: 200px;
+}
+
+/* Additional improvements for error message visibility */
+#error {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+}

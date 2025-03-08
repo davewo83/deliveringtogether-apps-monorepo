@@ -1,0 +1,19 @@
+{
+  "name": "deliveringtogether-apps",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev:coaching",
+    "dev:coaching": "cd apps/coaching && netlify dev",
+    "build": "npm run build:coaching",
+    "build:coaching": "cd apps/coaching && netlify build",
+    "postinstall": "echo 'Monorepo dependencies installed successfully!'"
+  },
+  "devDependencies": {
+    "netlify-cli": "^15.6.0"
+  }
+}

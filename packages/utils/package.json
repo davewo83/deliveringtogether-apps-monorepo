@@ -1,0 +1,12 @@
+{
+  "name": "@deliveringtogether/utils",
+  "version": "0.1.0",
+  "description": "Shared utilities for DeliveringTogether applications",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "echo 'Building Utils package'"
+  }
+}

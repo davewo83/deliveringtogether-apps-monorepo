@@ -1,0 +1,12 @@
+{
+  "name": "@deliveringtogether/coaching",
+  "version": "1.0.0",
+  "description": "Coaching question bank application",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'Build step handled by Netlify'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.31.0"
+  }
+}

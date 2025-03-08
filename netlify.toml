@@ -1,0 +1,29 @@
+[build]
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/coaching/ packages/"
+
+# Define redirects for the monorepo apps
+[[redirects]]
+  from = "/coaching/*"
+  to = "https://coaching.deliveringtogether.netlify.app/:splat"
+  status = 200
+
+# You can add more redirects for future apps
+[[redirects]]
+  from = "/feedbackforge/*"
+  to = "https://feedbackforge.deliveringtogether.netlify.app/:splat"
+  status = 200
+
+# Root domain redirect to default app
+[[redirects]]
+  from = "/"
+  to = "/coaching"
+  status = 302
+
+# Basic security headers for all apps
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"

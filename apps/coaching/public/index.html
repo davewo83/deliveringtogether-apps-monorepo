@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Access a comprehensive collection of powerful coaching questions organised by category. Use these questions to guide meaningful conversations and unlock insights in professional development and leadership contexts.">
+    <meta name="keywords" content="coaching, questions, team, empowerment, leadership">
+    <meta name="author" content="Delivering Together">
+    <meta property="og:title" content="Coaching Question Bank - Delivering Together">
+	<meta property="og:description" content="Access a comprehensive collection of powerful coaching questions organised by category. Use these questions to guide meaningful conversations and unlock insights.">
+	<meta property="og:url" content="https://apps.deliveringtogether.co.uk/coaching/">
+	<meta property="og:type" content="website">
+    <title>Coaching Question Bank</title>
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"></noscript>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="canonical" href="https://apps.deliveringtogether.co.uk/coaching/">
+</head>
+<body>
+    <main class="container">
+        <h1 class="page-title">Coaching Question Bank</h1>
+        <p class="page-subtitle">Explore powerful coaching questions to guide meaningful conversations.</p>
+        
+        <!-- Filter Categories with scroll buttons -->
+        <div class="filter-bar-container">
+            <button class="scroll-btn left" id="scroll-left">&#8249;</button>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-category="">All</button>
+                <!-- Filter placeholder helps maintain height -->
+                <div class="filter-placeholder"></div>
+            </div>
+            <button class="scroll-btn right" id="scroll-right">&#8250;</button>
+        </div>
+        
+        <!-- Results Grid with skeleton loader -->
+        <section id="results">
+            <!-- Skeleton loader visible until content loads -->
+            <div class="skeleton-loader">
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+                <div class="skeleton-card"></div>
+            </div>
+            <!-- Question cards will be populated by JavaScript -->
+        </section>
+        
+        <div id="sentinel"></div>
+        <div id="loading" style="display: none;">Loading...</div>
+        <div id="no-more-questions" style="display: none;">No more questions to load.</div>
+        <div id="error" style="display: none;"></div>
+    </main>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Explore More Coaching Resources</h3>
+                <p>Found this question bank helpful? Discover more insights on our blog:</p>
+                <a href="https://deliveringtogether.co.uk/" target="_blank" class="blog-link">DeliveringTogether Blog</a>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Featured Article</h3>
+                <p>Understanding the crucial differences between mentoring and coaching can transform your leadership approach:</p>
+                <a href="https://deliveringtogether.co.uk/2025/01/20/coaching-vs-managing/" target="_blank" class="article-link">
+                    Read: Coaching vs Managing - What's the Difference?
+                </a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 DeliveringTogether.co.uk | Uniting People, Purpose and Performance</p>
+        </div>
+    </footer>
+    
+    <script src="./script-safe.js"></script>
+</body>
+</html>
