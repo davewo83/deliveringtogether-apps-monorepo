@@ -92,9 +92,9 @@ const templates = {
         recipientExperience: 'developing',
         relationshipQuality: 'strong',
         feedbackReceptivity: 'seeks',
-        specificBehavior: 'you\'ve shown interest in developing your data visualization skills, and I've noticed you experimenting with different approaches',
-        situationImpact: 'your current visualizations effectively communicate the basic information but could be more impactful with some refinement',
-        desiredOutcome: 'work on simplifying complex charts and emphasizing the key insights through visual hierarchy and annotation',
+        specificBehavior: 'you\'ve shown interest in developing your data visualisation skills, and I\'ve noticed you experimenting with different approaches',
+        situationImpact: 'your current visualisations effectively communicate the basic information but could be more impactful with some refinement',
+        desiredOutcome: 'work on simplifying complex charts and emphasising the key insights through visual hierarchy and annotation',
         recurring: 'no'
     },
     'coaching-leadership': {
