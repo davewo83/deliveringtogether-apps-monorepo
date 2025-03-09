@@ -50,9 +50,9 @@ class FeedbackGenerator {
   getOpeningStatement(personalityType) {
     const openingStatements = {
       'D': 'I want to share some direct feedback about your recent work.',
-      'I': 'I'd like to talk about your work and share some thoughts on how we can collaborate even better.',
+      'I': 'I\'d like to talk about your work and share some thoughts on how we can collaborate even better.',
       'S': 'I appreciate your consistent contributions and would like to share some thoughts.',
-      'C': 'Based on my observations, I've compiled some feedback on your recent work.'
+      'C': 'Based on my observations, I\'ve compiled some feedback on your recent work.'
     };
 
     return openingStatements[personalityType] || 'I appreciate you taking the time to discuss this feedback.';
@@ -60,10 +60,10 @@ class FeedbackGenerator {
 
   getClosingStatement(personalityType) {
     const closingStatements = {
-      'D': 'Let me know what specific steps you'll take next.',
-      'I': 'I'm excited to see how you'll implement these ideas! Let's discuss further.',
-      'S': 'I'm here to support you through this process. What resources would be most helpful?',
-      'C': 'Please let me know if you'd like more specific data or examples to help you analyze this feedback.'
+      'D': 'Let me know what specific steps you\'ll take next.',
+      'I': 'I\'m excited to see how you\'ll implement these ideas! Let\'s discuss further.',
+      'S': 'I\'m here to support you through this process. What resources would be most helpful?',
+      'C': 'Please let me know if you\'d like more specific data or examples to help you analyze this feedback.'
     };
 
     return closingStatements[personalityType] || 'I welcome your thoughts on this feedback.';
