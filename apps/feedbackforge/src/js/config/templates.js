@@ -15,7 +15,7 @@ const templates = {
         relationshipQuality: 'established',
         feedbackReceptivity: 'accepts',
         specificBehavior: 'you exceeded your targets by 15% this quarter, delivering exceptional results for our department',
-        situationImpact: 'this contributed significantly to our team's overall performance and has set a new benchmark for what's possible',
+        situationImpact: 'this contributed significantly to our team\'s overall performance and has set a new benchmark for what\'s possible',
         desiredOutcome: 'continue applying this level of focus and strategic thinking to future projects',
         recurring: 'no'
     },
@@ -92,7 +92,7 @@ const templates = {
         recipientExperience: 'developing',
         relationshipQuality: 'strong',
         feedbackReceptivity: 'seeks',
-        specificBehavior: 'you've shown interest in developing your data visualization skills, and I've noticed you experimenting with different approaches',
+        specificBehavior: 'you\'ve shown interest in developing your data visualization skills, and I've noticed you experimenting with different approaches',
         situationImpact: 'your current visualizations effectively communicate the basic information but could be more impactful with some refinement',
         desiredOutcome: 'work on simplifying complex charts and emphasizing the key insights through visual hierarchy and annotation',
         recurring: 'no'
