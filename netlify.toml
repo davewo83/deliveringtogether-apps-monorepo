@@ -1,5 +1,5 @@
 [build]
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/coaching/ packages/"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/ packages/"
 
 # Define redirects for the monorepo apps
 [[redirects]]
