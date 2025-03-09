@@ -9,8 +9,11 @@
   "scripts": {
     "dev": "npm run dev:coaching",
     "dev:coaching": "cd apps/coaching && netlify dev",
+    "dev:feedbackforge": "cd apps/feedbackforge && netlify dev",
     "build": "npm run build:coaching",
     "build:coaching": "cd apps/coaching && netlify build",
+    "build:feedbackforge": "cd apps/feedbackforge && netlify build",
+    "build:all": "npm run build:coaching && npm run build:feedbackforge",
     "postinstall": "echo 'Monorepo dependencies installed successfully!'"
   },
   "devDependencies": {

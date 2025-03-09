@@ -4,13 +4,13 @@
 # Define redirects for the monorepo apps
 [[redirects]]
   from = "/coaching/*"
-  to = "https://coaching.deliveringtogether.netlify.app/:splat"
+  to = "https://lovely-paprenjak-161450.netlify.app/:splat"
   status = 200
 
 # You can add more redirects for future apps
 [[redirects]]
   from = "/feedbackforge/*"
-  to = "https://feedbackforge.deliveringtogether.netlify.app/:splat"
+  to = "https://feedbackforgedt.netlify.app/:splat"
   status = 200
 
 # Root domain redirect to default app
