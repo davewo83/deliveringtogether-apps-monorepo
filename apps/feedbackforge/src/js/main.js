@@ -1,14 +1,19 @@
+// Initial JavaScript file
 console.log('FeedbackForge initializing...');
 
-// Simple DOM manipulation to show it's working
+// Basic DOM manipulation to show it's working
 document.addEventListener('DOMContentLoaded', () => {
   const appContainer = document.getElementById('app-container');
   if (appContainer) {
-    appContainer.innerHTML = `
-      <div style="padding: 20px; border: 1px solid #ccc; border-radius: 8px; margin: 20px 0;">
-        <h2>Welcome to FeedbackForge</h2>
-        <p>Our evidence-based feedback generator is coming soon!</p>
-      </div>
-    `;
+    // Add a simple message to show that JavaScript is working
+    const statusElement = document.createElement('p');
+    statusElement.textContent = 'JavaScript is active and working!';
+    statusElement.style.textAlign = 'center';
+    statusElement.style.padding = '10px';
+    statusElement.style.background = '#e6f7ff';
+    statusElement.style.borderRadius = '4px';
+    statusElement.style.marginTop = '20px';
+    
+    appContainer.appendChild(statusElement);
   }
 });

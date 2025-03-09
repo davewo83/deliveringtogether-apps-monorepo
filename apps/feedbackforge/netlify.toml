@@ -1,5 +1,5 @@
 [build]
-  command = "mkdir -p dist && cp -r public/* dist/ || echo 'No public files copied'"
+  command = "npm run build"
   publish = "dist"
 
 [build.environment]
