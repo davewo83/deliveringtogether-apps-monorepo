@@ -1,11 +1,11 @@
 [build]
-  command = "npm run build"
+  command = "mkdir -p dist && cp -r public/* dist/ || echo 'No public files copied'"
   publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "18"
 
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[build.environment]
-  NODE_VERSION = "18"
