@@ -5,49 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedbackForge - Evidence-Based Feedback Generator</title>
     <meta name="description" content="Create personalised, effective feedback messages based on psychological research">
-    <!-- We'll add proper CSS later -->
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            color: #333;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-        h1 {
-            color: #2c3e50;
-        }
-        footer {
-            margin-top: 60px;
-            text-align: center;
-        }
-    </style>
+    <!-- CSS will be injected by Vite -->
 </head>
 <body>
     <header>
-        <h1>FeedbackForge</h1>
-        <p>Evidence-Based Feedback Generator</p>
+        <div class="container header-content">
+            <h1>FeedbackForge</h1>
+            <p>Evidence-Based Feedback Generator</p>
+        </div>
     </header>
 
-    <main>
-        <div id="app-container">
-            <div class="coming-soon">
-                <h2>Coming Soon</h2>
-                <p>We're building a powerful tool to help managers craft personalized, effective feedback based on psychological research.</p>
-            </div>
-        </div>
+    <main class="container">
+        <div id="form-container"></div>
+        <div id="results-container"></div>
     </main>
 
     <footer>
-        <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
+        <div class="container">
+            <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
+        </div>
     </footer>
 
-    <!-- This script will be added by Vite -->
+    <!-- JavaScript will be injected by Vite -->
     <script type="module" src="/src/js/main.js"></script>
 </body>
 </html>
