@@ -80,7 +80,7 @@ const templates = {
         relationshipQuality: 'established',
         feedbackReceptivity: 'varies',
         specificBehavior: 'in team meetings, you often share ideas that are difficult for others to follow due to limited context or explanation',
-        situationImpact: 'this has led to confusion and sometimes means your valuable perspectives aren't fully considered',
+        situationImpact: 'this has led to confusion and sometimes means your valuable perspectives aren/'t fully considered',
         desiredOutcome: 'structure your contributions with a brief context, your main point, and a specific example or next step',
         recurring: 'yes'
     },
