@@ -396,5 +396,38 @@
 	<script src="main.js"></script>
 	<script src="feedback-generator.js"></script>
 	<script src="navigation-fix.js"></script>
+	<!-- Add this at the bottom of your index.html before the closing </body> tag -->
+<script src="feedback-generator-core.js"></script>
+<script>
+  // This script ensures the core functionality is properly initialized
+  document.addEventListener('DOMContentLoaded', function() {
+    // Check if elements exist
+    const previewButton = document.getElementById('preview-feedback');
+    const generateButton = document.getElementById('generate-feedback');
+    const form = document.getElementById('feedback-form');
+    
+    if (!previewButton) {
+      console.error('Preview button not found. Check your HTML structure.');
+    }
+    
+    if (!generateButton) {
+      console.error('Generate button not found. Check your HTML structure.');
+    }
+    
+    if (!form) {
+      console.error('Feedback form not found. Check your HTML structure.');
+    }
+    
+    // Initialize form fields
+    const feedbackModel = document.getElementById('feedback-model');
+    if (feedbackModel) {
+      // Trigger change event to ensure proper field visibility
+      const event = new Event('change');
+      feedbackModel.dispatchEvent(event);
+    }
+    
+    console.log('FeedbackForge core initialized successfully.');
+  });
+</script>
 </body>
 </html>
