@@ -28,17 +28,35 @@
     <main class="container">
         <div class="tabs">
             <div class="tab active" data-tab="create">Create Feedback</div>
-            <div class="tab" data-tab="about">About</div>
+            <div class="tab" data-tab="templates">Templates</div>
             <div class="tab" data-tab="research">Research</div>
+            <div class="tab" data-tab="about">About</div>
         </div>
 
         <div id="create-tab" class="tab-content active">
+            <!-- Progress indicator -->
+            <div class="progress-indicator">
+                <div class="progress-step active" data-step="context">1. Context</div>
+                <div class="progress-step" data-step="recipient">2. Recipient</div>
+                <div class="progress-step" data-step="content">3. Content</div>
+                <div class="progress-step" data-step="framing">4. Framing</div>
+                <div class="progress-step" data-step="review">5. Review</div>
+            </div>
+
             <div id="form-container" class="card">
-                <h2>Feedback Parameters</h2>
+                <h2>Feedback Generator</h2>
+                
+                <!-- Guided tour button -->
+                <button id="tour-button" class="tertiary-button tour-button">
+                    <span class="tour-icon">ⓘ</span> Take a guided tour
+                </button>
+                
                 <form id="feedback-form">
                     <!-- Context Section -->
-                    <div class="form-section">
-                        <h3>Feedback Context</h3>
+                    <div class="form-section context active-section" id="context-section">
+                        <h3>1. Feedback Context 
+                            <span class="info-tooltip" data-tooltip="The context of your feedback affects how it should be framed and delivered">ⓘ</span>
+                        </h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="feedback-type">Feedback Type:</label>
@@ -49,6 +67,7 @@
                                     <option value="developmental">Developmental</option>
                                 </select>
                                 <div class="help-text">Choose the primary purpose of your feedback</div>
+                                <button type="button" class="example-button" data-example="feedback-type">See examples</button>
                             </div>
                             
                             <div class="form-group">
@@ -59,6 +78,7 @@
                                     <option value="star">Situation-Task-Action-Result (STAR)</option>
                                 </select>
                                 <div class="help-text">Choose a structured approach to organize your feedback</div>
+                                <button type="button" class="example-button" data-example="feedback-model">See examples</button>
                             </div>
                         </div>
                         
@@ -83,11 +103,17 @@
                                 <div class="help-text">What is the current workplace context?</div>
                             </div>
                         </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="primary-button next-button" data-next="recipient">Next: Recipient Information</button>
+                        </div>
                     </div>
 
                     <!-- Recipient Information -->
-                    <div class="form-section">
-                        <h3>Recipient Information</h3>
+                    <div class="form-section recipient" id="recipient-section">
+                        <h3>2. Recipient Information
+                            <span class="info-tooltip" data-tooltip="Understanding your recipient's communication preferences helps tailor feedback effectively">ⓘ</span>
+                        </h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="recipient-name">Recipient Name:</label>
@@ -109,28 +135,39 @@
                                 <option value="C">Analytical (High C) - Detail-oriented, values accuracy</option>
                             </select>
                             <div class="help-text">Select the recipient's preferred communication style</div>
+                            <button type="button" class="example-button" data-example="disc-styles">Learn about DISC styles</button>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="secondary-button prev-button" data-prev="context">Previous: Context</button>
+                            <button type="button" class="primary-button next-button" data-next="content">Next: Feedback Content</button>
                         </div>
                     </div>
 
                     <!-- Feedback Content Section -->
-                    <div class="form-section" id="feedback-content">
-                        <h3>Feedback Content</h3>
+                    <div class="form-section content" id="content-section">
+                        <h3>3. Feedback Content
+                            <span class="info-tooltip" data-tooltip="The core content of your feedback, structured according to your chosen model">ⓘ</span>
+                        </h3>
                         
                         <!-- Simple Model Fields -->
                         <div class="model-fields" id="simple-fields">
                             <div class="form-group">
                                 <label for="specific-strengths">Specific Strengths:</label>
                                 <textarea id="specific-strengths" name="specificStrengths" placeholder="What specific strengths would you like to acknowledge?"></textarea>
+                                <div class="help-text">Focus on observable behaviors and concrete examples</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="areas-improvement">Areas for Improvement:</label>
                                 <textarea id="areas-improvement" name="areasForImprovement" placeholder="What areas could be improved?"></textarea>
+                                <div class="help-text">Use growth mindset language that focuses on development potential</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="support-offered">Support Offered:</label>
                                 <textarea id="support-offered" name="supportOffered" placeholder="What support can you offer?"></textarea>
+                                <div class="help-text">Be specific about what resources or assistance you can provide</div>
                             </div>
                         </div>
                         
@@ -139,16 +176,19 @@
                             <div class="form-group">
                                 <label for="situation">Situation:</label>
                                 <textarea id="situation" name="situation" placeholder="Describe the specific situation or context"></textarea>
+                                <div class="help-text">Be specific about when and where the behavior occurred</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="behavior">Behavior:</label>
                                 <textarea id="behavior" name="behavior" placeholder="Describe the specific behavior observed"></textarea>
+                                <div class="help-text">Focus on observable actions, not assumptions about motives</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="impact">Impact:</label>
                                 <textarea id="impact" name="impact" placeholder="Describe the impact or result of this behavior"></textarea>
+                                <div class="help-text">Explain the effects on you, the team, customers, or the organization</div>
                             </div>
                         </div>
                         
@@ -157,28 +197,39 @@
                             <div class="form-group">
                                 <label for="star-situation">Situation:</label>
                                 <textarea id="star-situation" name="starSituation" placeholder="Describe the situation or context"></textarea>
+                                <div class="help-text">Set the scene with relevant background information</div>
                             </div>
 
                             <div class="form-group">
                                 <label for="task">Task:</label>
                                 <textarea id="task" name="task" placeholder="What was the task or objective?"></textarea>
+                                <div class="help-text">Describe what needed to be accomplished</div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="action">Action:</label>
                                 <textarea id="action" name="action" placeholder="What actions were taken?"></textarea>
+                                <div class="help-text">Detail the specific steps or approach the person took</div>
                             </div>
                             
                             <div class="form-group">
                                 <label for="result">Result:</label>
                                 <textarea id="result" name="result" placeholder="What was the outcome or result?"></textarea>
+                                <div class="help-text">Describe the impact, including measurable outcomes if possible</div>
                             </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="secondary-button prev-button" data-prev="recipient">Previous: Recipient</button>
+                            <button type="button" class="primary-button next-button" data-next="framing">Next: Feedback Framing</button>
                         </div>
                     </div>
                     
                     <!-- Psychological Safety & Growth Mindset Section -->
-                    <div class="form-section">
-                        <h3>Feedback Framing</h3>
+                    <div class="form-section framing" id="framing-section">
+                        <h3>4. Feedback Framing
+                            <span class="info-tooltip" data-tooltip="How you frame your feedback affects psychological safety and receptiveness">ⓘ</span>
+                        </h3>
                         <div class="form-group">
                             <label>Psychological Safety Elements:</label>
                             <div class="checkbox-group">
@@ -187,6 +238,7 @@
                                 <label><input type="checkbox" name="psychSafetyElements" value="collaborative"> Use collaborative approach</label>
                                 <label><input type="checkbox" name="psychSafetyElements" value="future-focused"> Focus on future improvement</label>
                             </div>
+                            <button type="button" class="example-button" data-example="psych-safety">Learn about psychological safety</button>
                         </div>
                         
                         <div class="form-group">
@@ -197,12 +249,47 @@
                                 <option value="coaching">Coaching</option>
                                 <option value="inquiring">Inquiring</option>
                             </select>
+                            <div class="help-text">Match your tone to the recipient's preferences and context</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="follow-up">Follow-up Plan:</label>
+                            <textarea id="follow-up" name="followUp" placeholder="What follow-up actions will you take after delivering this feedback?"></textarea>
+                            <div class="help-text">Specific plans for checking progress and providing ongoing support</div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="secondary-button prev-button" data-prev="content">Previous: Content</button>
+                            <button type="button" class="primary-button next-button" data-next="review">Next: Review & Generate</button>
                         </div>
                     </div>
 
-                    <div class="form-controls">
-                        <button type="submit" id="generate-feedback" class="primary-button">Generate Feedback</button>
-                        <button type="reset" class="secondary-button">Reset</button>
+                    <!-- Review & Generate Section -->
+                    <div class="form-section review" id="review-section">
+                        <h3>5. Review & Generate
+                            <span class="info-tooltip" data-tooltip="Review your settings before generating feedback">ⓘ</span>
+                        </h3>
+                        
+                        <div id="form-summary">
+                            <!-- This will be filled with JS -->
+                            <p>Your summary will appear here once all required fields are completed.</p>
+                        </div>
+
+                        <div class="template-save">
+                            <div class="form-group">
+                                <label for="save-template">Save as Template (Optional):</label>
+                                <input type="text" id="save-template" name="templateName" placeholder="Enter a name for this template">
+                                <div class="help-text">Save these settings as a template for future use</div>
+                            </div>
+                        </div>
+
+                        <div class="form-navigation">
+                            <button type="button" class="secondary-button prev-button" data-prev="framing">Previous: Framing</button>
+                            <div class="action-buttons">
+                                <button type="button" id="preview-feedback" class="secondary-button">Preview Feedback</button>
+                                <button type="submit" id="generate-feedback" class="primary-button">Generate Feedback</button>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -210,19 +297,13 @@
             <div id="results-container"></div>
         </div>
 
-        <div id="about-tab" class="tab-content">
+        <div id="templates-tab" class="tab-content">
             <div class="card">
-                <h2>About FeedbackForge</h2>
-                <p>FeedbackForge is an evidence-based feedback generator designed to help managers create effective, personalized feedback messages.</p>
-                <p>Our approach is based on psychological research on feedback reception, including:</p>
-                <ul>
-                    <li>Psychological safety principles</li>
-                    <li>Growth mindset language</li>
-                    <li>Communication style preferences</li>
-                    <li>Self-concept preservation</li>
-                    <li>Contextual factors in feedback effectiveness</li>
-                </ul>
-                <p>By using research-backed approaches to feedback delivery, managers can provide feedback that is better received and more likely to lead to positive behavioral change.</p>
+                <h2>Saved Templates</h2>
+                <div id="templates-container">
+                    <p class="empty-templates-message">You haven't saved any templates yet. Create feedback and save as a template to see them here.</p>
+                    <!-- Templates will be loaded here via JS -->
+                </div>
             </div>
         </div>
 
@@ -253,9 +334,58 @@
                     <li>Using collaborative language</li>
                     <li>Focusing on future development</li>
                 </ul>
+                
+                <h3>Context Awareness</h3>
+                <p>Research indicates that the setting in which feedback is delivered significantly impacts its effectiveness. FeedbackForge adapts to different contexts:</p>
+                <ul>
+                    <li>Delivery method considerations (face-to-face, written, remote)</li>
+                    <li>Specialized approaches for crisis situations</li>
+                    <li>Adaptations for organizational change contexts</li>
+                </ul>
+            </div>
+        </div>
+
+        <div id="about-tab" class="tab-content">
+            <div class="card">
+                <h2>About FeedbackForge</h2>
+                <p>FeedbackForge is an evidence-based feedback generator designed to help managers create effective, personalized feedback messages.</p>
+                <p>Our approach is based on psychological research on feedback reception, including:</p>
+                <ul>
+                    <li>Psychological safety principles</li>
+                    <li>Growth mindset language</li>
+                    <li>Communication style preferences</li>
+                    <li>Self-concept preservation</li>
+                    <li>Contextual factors in feedback effectiveness</li>
+                </ul>
+                <p>By using research-backed approaches to feedback delivery, managers can provide feedback that is better received and more likely to lead to positive behavioral change.</p>
+                
+                <h3>User Feedback</h3>
+                <p>We're constantly improving FeedbackForge based on user experiences. Please share your thoughts:</p>
+                <div class="feedback-form">
+                    <div class="form-group">
+                        <label for="user-feedback">Your Feedback:</label>
+                        <textarea id="user-feedback" placeholder="Share your experience with FeedbackForge..."></textarea>
+                    </div>
+                    <button id="submit-feedback" class="primary-button">Submit Feedback</button>
+                </div>
             </div>
         </div>
     </main>
+
+    <!-- Modal Templates -->
+    <div id="modal-container" class="modal-container">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="modal-title">Title</h3>
+                <button class="close-modal">×</button>
+            </div>
+            <div class="modal-content" id="modal-content">
+                <!-- Modal content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltips are handled by CSS/JS -->
 
     <footer>
         <div class="container">
