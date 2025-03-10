@@ -1209,7 +1209,7 @@ function getOpeningStatement(personalityType, situation, feedbackType, tone) {
     
     if (tone === 'direct') {
         opening = opening
-            .replace('I'd like to', 'I want to')
+            .replace('I\'d like to', 'I want to')
             .replace('might', 'should')
             .replace('could', 'will');
     }
