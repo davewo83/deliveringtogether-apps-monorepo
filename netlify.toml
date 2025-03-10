@@ -10,7 +10,12 @@
 
 # You can add more redirects for future apps
 [[redirects]]
-  from = "/feedbackforge/*"
+  from = "/feedback"
+  to = "https://feedbackforgedt.netlify.app/"
+  status = 200
+
+[[redirects]]
+  from = "/feedback/*"
   to = "https://feedbackforgedt.netlify.app/:splat"
   status = 200
 
