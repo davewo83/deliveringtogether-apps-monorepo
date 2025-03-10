@@ -1,5 +1,6 @@
 [build]
-  ignore = "exit 1"  # This will always run the build
+  # Only build coaching app when changes affect it specifically
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/coaching/"
 
 # Define redirects for the monorepo apps
 [[redirects]]
