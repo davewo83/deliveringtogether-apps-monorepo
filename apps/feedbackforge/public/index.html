@@ -5,69 +5,45 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedbackForge - Evidence-Based Feedback Generator</title>
     <meta name="description" content="Create personalised, effective feedback messages based on psychological research">
-    <!-- You can include a basic style for the static version -->
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            line-height: 1.6;
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 20px;
-            color: #333;
-        }
-        .container {
-            margin-bottom: 40px;
-        }
-        header {
-            margin-bottom: 30px;
-        }
-        h1 {
-            color: #2c3e50;
-            margin: 0;
-        }
-        footer {
-            margin-top: 60px;
-            text-align: right;
-            color: #666;
-        }
-        a {
-            color: #3a7ca5;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        /* Add some basic styling for the form container */
-        #form-container {
-            background: #f5f7fa;
-            padding: 30px;
-            border-radius: 8px;
-            margin-top: 30px;
-            min-height: 300px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <h1>FeedbackForge</h1>
-        <p>Create personalised, effective feedback messages based on psychological research</p>
+        <div class="container">
+            <h1>FeedbackForge</h1>
+            <p>Create personalised, effective feedback messages based on psychological research</p>
+        </div>
     </header>
 
-    <main>
-        <!-- This is where the form will be rendered -->
-        <div id="form-container">
-            <p>Loading form...</p>
+    <main class="container">
+        <div class="tabs">
+            <div class="tab active" data-tab="create">Create Feedback</div>
+            <div class="tab" data-tab="about">About</div>
         </div>
-        
-        <!-- This is where the results will be displayed -->
-        <div id="results-container"></div>
+
+        <div id="create-tab" class="tab-content active">
+            <div id="form-container" class="card">
+                <!-- Form will be loaded via JavaScript -->
+            </div>
+            
+            <div id="results-container"></div>
+        </div>
+
+        <div id="about-tab" class="tab-content">
+            <div class="card">
+                <h2>About FeedbackForge</h2>
+                <p>FeedbackForge is an evidence-based feedback generator designed to help managers create effective, personalized feedback messages.</p>
+                <!-- About content -->
+            </div>
+        </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
+        <div class="container">
+            <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
+        </div>
     </footer>
 
-    <!-- Reference to your JavaScript file -->
-    <script type="module" src="/src/js/main.js"></script>
+    <script src="feedback-generator.js"></script>
 </body>
 </html>
