@@ -5,7 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FeedbackForge - Evidence-Based Feedback Generator</title>
     <meta name="description" content="Create personalised, effective feedback messages based on psychological research">
-    <link rel="stylesheet" href="/style.css">
+    
+    <script>
+      // Dynamically set the base URL depending on the current path
+      if (window.location.pathname.startsWith('/feedback')) {
+        document.write('<base href="/feedback/">');
+      } else {
+        document.write('<base href="/">');
+      }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
@@ -33,7 +43,14 @@
             <div class="card">
                 <h2>About FeedbackForge</h2>
                 <p>FeedbackForge is an evidence-based feedback generator designed to help managers create effective, personalized feedback messages.</p>
-                <!-- About content -->
+                <p>Our approach is based on psychological research on feedback reception, including:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Psychological safety principles</li>
+                    <li>Growth mindset language</li>
+                    <li>Communication style preferences</li>
+                    <li>Self-concept preservation</li>
+                </ul>
+                <p style="margin-top: 20px;">By using research-backed approaches to feedback delivery, managers can provide feedback that is better received and more likely to lead to positive behavioral change.</p>
             </div>
         </div>
     </main>
@@ -44,6 +61,6 @@
         </div>
     </footer>
 
-    <script src="/feedback-generator.js"></script>
+    <script src="feedback-generator.js"></script>
 </body>
 </html>

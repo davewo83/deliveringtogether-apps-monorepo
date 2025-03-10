@@ -1,6 +1,10 @@
-# Feedback redirects must come before catch-all
+# Feedback app redirects
 /feedback https://feedbackforgedt.netlify.app/ 200!
 /feedback/* https://feedbackforgedt.netlify.app/:splat 200!
+
+# Add explicit redirects for key resources
+/feedback-generator.js https://feedbackforgedt.netlify.app/feedback-generator.js 200!
+/style.css https://feedbackforgedt.netlify.app/style.css 200!
 
 # API redirects
 /api/questions /.netlify/functions/fetch-questions 200!
