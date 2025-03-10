@@ -1,15 +1,14 @@
-# API redirects (preserve these)
+# Feedback redirects must come before catch-all
+/feedback https://feedbackforgedt.netlify.app/ 200!
+/feedback/* https://feedbackforgedt.netlify.app/:splat 200!
+
+# API redirects
 /api/questions /.netlify/functions/fetch-questions 200!
 /api/categories /.netlify/functions/fetch-categories 200!
-
-# Remove the circular redirect
-# /coaching/* /:splat 200
-# Also remove the root redirect for now
-# / /coaching 302
 
 # Make sure API routes work from any path
 /coaching/api/questions /.netlify/functions/fetch-questions 200!
 /coaching/api/categories /.netlify/functions/fetch-categories 200!
 
-# Ensure SPA routing works
+# Ensure SPA routing works - must be last
 /* /index.html 200
