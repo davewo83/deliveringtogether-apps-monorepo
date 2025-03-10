@@ -41,6 +41,12 @@ h2 {
     padding-bottom: 10px;
 }
 
+h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
 /* Form styles */
 .card {
     background: white;
@@ -50,8 +56,27 @@ h2 {
     padding: 25px;
 }
 
+.form-section {
+    margin-bottom: 25px;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 20px;
+}
+
+.form-section:last-child {
+    border-bottom: none;
+}
+
+.form-row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -10px;
+}
+
 .form-group {
     margin-bottom: 20px;
+    padding: 0 10px;
+    flex: 1;
+    min-width: 250px;
 }
 
 label {
@@ -77,8 +102,25 @@ select {
     background-color: white;
 }
 
-.form-section {
-    margin-bottom: 25px;
+.help-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+}
+
+.checkbox-group {
+    margin-top: 10px;
+}
+
+.checkbox-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
 }
 
 .form-controls {
@@ -86,6 +128,21 @@ select {
     justify-content: flex-end;
     gap: 10px;
     margin-top: 15px;
+}
+
+/* Error styles */
+.error {
+    border-color: #e74c3c !important;
+}
+
+.error-message {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
+
+.model-error {
+    margin-bottom: 15px;
 }
 
 /* Button styles */
@@ -117,7 +174,18 @@ button {
     background-color: #e5e5e5;
 }
 
+.tertiary-button {
+    background-color: transparent;
+    color: #333;
+    border: none;
+    text-decoration: underline;
+}
+
 /* Results styles */
+.result-card {
+    margin-top: 30px;
+}
+
 .feedback-script {
     background-color: #f8f9fa;
     padding: 20px;
@@ -125,6 +193,18 @@ button {
     white-space: pre-line;
     margin: 20px 0;
     border: 1px solid #eee;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.5;
+}
+
+.model-info {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.model-info p {
+    margin-bottom: 5px;
 }
 
 /* Footer styles */
@@ -180,4 +260,35 @@ a:hover {
 
 .tab-content.active {
     display: block;
+}
+
+/* Research tab styles */
+#research-tab ul {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+#research-tab li {
+    margin-bottom: 8px;
+}
+
+#research-tab h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .form-row {
+        flex-direction: column;
+    }
+    
+    .form-group {
+        width: 100%;
+    }
+    
+    .tab {
+        padding: 8px 10px;
+        font-size: 14px;
+    }
 }

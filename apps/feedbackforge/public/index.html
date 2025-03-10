@@ -29,11 +29,182 @@
         <div class="tabs">
             <div class="tab active" data-tab="create">Create Feedback</div>
             <div class="tab" data-tab="about">About</div>
+            <div class="tab" data-tab="research">Research</div>
         </div>
 
         <div id="create-tab" class="tab-content active">
             <div id="form-container" class="card">
-                <!-- Form will be loaded via JavaScript -->
+                <h2>Feedback Parameters</h2>
+                <form id="feedback-form">
+                    <!-- Context Section -->
+                    <div class="form-section">
+                        <h3>Feedback Context</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="feedback-type">Feedback Type:</label>
+                                <select id="feedback-type" name="feedbackType" required>
+                                    <option value="recognition">Recognition</option>
+                                    <option value="improvement">Improvement</option>
+                                    <option value="coaching">Coaching</option>
+                                    <option value="developmental">Developmental</option>
+                                </select>
+                                <div class="help-text">Choose the primary purpose of your feedback</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="feedback-model">Feedback Model:</label>
+                                <select id="feedback-model" name="feedbackModel" required>
+                                    <option value="simple">Simple</option>
+                                    <option value="sbi">Situation-Behavior-Impact (SBI)</option>
+                                    <option value="star">Situation-Task-Action-Result (STAR)</option>
+                                </select>
+                                <div class="help-text">Choose a structured approach to organize your feedback</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="delivery-method">Delivery Method:</label>
+                                <select id="delivery-method" name="deliveryMethod" required>
+                                    <option value="face-to-face">Face-to-Face</option>
+                                    <option value="written">Written</option>
+                                    <option value="remote">Remote Video Call</option>
+                                </select>
+                                <div class="help-text">How will this feedback be delivered?</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="workplace-situation">Workplace Situation:</label>
+                                <select id="workplace-situation" name="workplaceSituation" required>
+                                    <option value="normal">Normal Operations</option>
+                                    <option value="crisis">Crisis/High Pressure</option>
+                                    <option value="change">Organisational Change</option>
+                                </select>
+                                <div class="help-text">What is the current workplace context?</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recipient Information -->
+                    <div class="form-section">
+                        <h3>Recipient Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="recipient-name">Recipient Name:</label>
+                                <input type="text" id="recipient-name" name="recipientName" placeholder="Team member name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="recipient-role">Role:</label>
+                                <input type="text" id="recipient-role" name="recipientRole" placeholder="Team member role">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="personality-type">Communication Style Preference:</label>
+                            <select id="personality-type" name="personalityType" required>
+                                <option value="D">Direct (High D) - Focus on results, bottom line</option>
+                                <option value="I">Interactive (High I) - Enthusiastic, collaborative</option>
+                                <option value="S">Supportive (High S) - Patient, methodical approach</option>
+                                <option value="C">Analytical (High C) - Detail-oriented, values accuracy</option>
+                            </select>
+                            <div class="help-text">Select the recipient's preferred communication style</div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Content Section -->
+                    <div class="form-section" id="feedback-content">
+                        <h3>Feedback Content</h3>
+                        
+                        <!-- Simple Model Fields -->
+                        <div class="model-fields" id="simple-fields">
+                            <div class="form-group">
+                                <label for="specific-strengths">Specific Strengths:</label>
+                                <textarea id="specific-strengths" name="specificStrengths" placeholder="What specific strengths would you like to acknowledge?"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="areas-improvement">Areas for Improvement:</label>
+                                <textarea id="areas-improvement" name="areasForImprovement" placeholder="What areas could be improved?"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="support-offered">Support Offered:</label>
+                                <textarea id="support-offered" name="supportOffered" placeholder="What support can you offer?"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- SBI Model Fields -->
+                        <div class="model-fields" id="sbi-fields" style="display:none;">
+                            <div class="form-group">
+                                <label for="situation">Situation:</label>
+                                <textarea id="situation" name="situation" placeholder="Describe the specific situation or context"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="behavior">Behavior:</label>
+                                <textarea id="behavior" name="behavior" placeholder="Describe the specific behavior observed"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="impact">Impact:</label>
+                                <textarea id="impact" name="impact" placeholder="Describe the impact or result of this behavior"></textarea>
+                            </div>
+                        </div>
+                        
+                        <!-- STAR Model Fields -->
+                        <div class="model-fields" id="star-fields" style="display:none;">
+                            <div class="form-group">
+                                <label for="star-situation">Situation:</label>
+                                <textarea id="star-situation" name="starSituation" placeholder="Describe the situation or context"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="task">Task:</label>
+                                <textarea id="task" name="task" placeholder="What was the task or objective?"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="action">Action:</label>
+                                <textarea id="action" name="action" placeholder="What actions were taken?"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="result">Result:</label>
+                                <textarea id="result" name="result" placeholder="What was the outcome or result?"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Psychological Safety & Growth Mindset Section -->
+                    <div class="form-section">
+                        <h3>Feedback Framing</h3>
+                        <div class="form-group">
+                            <label>Psychological Safety Elements:</label>
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" name="psychSafetyElements" value="separate-identity" checked> Separate performance from identity</label>
+                                <label><input type="checkbox" name="psychSafetyElements" value="learning-opportunity" checked> Frame as learning opportunity</label>
+                                <label><input type="checkbox" name="psychSafetyElements" value="collaborative"> Use collaborative approach</label>
+                                <label><input type="checkbox" name="psychSafetyElements" value="future-focused"> Focus on future improvement</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tone">Overall Tone:</label>
+                            <select id="tone" name="tone" required>
+                                <option value="supportive">Supportive</option>
+                                <option value="direct">Direct</option>
+                                <option value="coaching">Coaching</option>
+                                <option value="inquiring">Inquiring</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-controls">
+                        <button type="submit" id="generate-feedback" class="primary-button">Generate Feedback</button>
+                        <button type="reset" class="secondary-button">Reset</button>
+                    </div>
+                </form>
             </div>
             
             <div id="results-container"></div>
@@ -44,13 +215,44 @@
                 <h2>About FeedbackForge</h2>
                 <p>FeedbackForge is an evidence-based feedback generator designed to help managers create effective, personalized feedback messages.</p>
                 <p>Our approach is based on psychological research on feedback reception, including:</p>
-                <ul style="margin-left: 20px; margin-top: 10px;">
+                <ul>
                     <li>Psychological safety principles</li>
                     <li>Growth mindset language</li>
                     <li>Communication style preferences</li>
                     <li>Self-concept preservation</li>
+                    <li>Contextual factors in feedback effectiveness</li>
                 </ul>
-                <p style="margin-top: 20px;">By using research-backed approaches to feedback delivery, managers can provide feedback that is better received and more likely to lead to positive behavioral change.</p>
+                <p>By using research-backed approaches to feedback delivery, managers can provide feedback that is better received and more likely to lead to positive behavioral change.</p>
+            </div>
+        </div>
+
+        <div id="research-tab" class="tab-content">
+            <div class="card">
+                <h2>Research Basis</h2>
+                <h3>Feedback Models</h3>
+                <p>The structured feedback models in FeedbackForge are based on established frameworks proven to enhance clarity and effectiveness:</p>
+                <ul>
+                    <li><strong>SBI (Situation-Behavior-Impact)</strong> - Focuses on specific behaviors rather than personality, reducing defensiveness</li>
+                    <li><strong>STAR (Situation-Task-Action-Result)</strong> - Provides a structured approach emphasizing the link between actions and outcomes</li>
+                </ul>
+                
+                <h3>Communication Style Adaptation</h3>
+                <p>Research shows that personality frameworks like DISC offer valuable insights into feedback preferences. FeedbackForge adapts feedback language to match the recipient's communication style:</p>
+                <ul>
+                    <li><strong>Direct (D-style)</strong> - Concise, results-focused language</li>
+                    <li><strong>Interactive (I-style)</strong> - Enthusiastic, relationship-oriented language</li>
+                    <li><strong>Supportive (S-style)</strong> - Methodical, supportive tone</li>
+                    <li><strong>Analytical (C-style)</strong> - Detailed, logical explanations</li>
+                </ul>
+                
+                <h3>Psychological Safety</h3>
+                <p>Psychological safety is essential for creating an environment where feedback is openly received. FeedbackForge incorporates elements that enhance psychological safety:</p>
+                <ul>
+                    <li>Separating performance from identity</li>
+                    <li>Framing feedback as learning opportunities</li>
+                    <li>Using collaborative language</li>
+                    <li>Focusing on future development</li>
+                </ul>
             </div>
         </div>
     </main>
