@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeedbackForge - Quick Start Guide</title>
+    <meta name="description" content="Learn how to use FeedbackForge to create effective feedback">
+    
+    <script>
+      // Dynamically set the base URL depending on the current path
+      if (window.location.pathname.startsWith('/feedback')) {
+        document.write('<base href="/feedback/">');
+      } else {
+        document.write('<base href="/">');
+      }
+    </script>
+    
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Guide-specific styles */
+        .guide-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .guide-container h1 {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .guide-container h2 {
+            font-size: 1.8rem;
+            margin: 2rem 0 1rem;
+            color: #3a7ca5;
+        }
+        
+        .guide-container h3 {
+            font-size: 1.4rem;
+            margin: 1.5rem 0 0.8rem;
+            color: #2c3e50;
+        }
+        
+        .guide-container p, .guide-container li {
+            margin-bottom: 0.8rem;
+            line-height: 1.7;
+        }
+        
+        .guide-container ol, .guide-container ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .guide-tip {
+            background-color: #f0f7ff;
+            border-left: 4px solid #3a7ca5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .guide-tip::before {
+            content: "💡 Tip: ";
+            font-weight: bold;
+            color: #3a7ca5;
+        }
+        
+        .guide-step {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .guide-step h3 {
+            margin-top: 0;
+            color: #3a7ca5;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .guide-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .guide-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        
+        @media print {
+            .no-print {
+                display: none;
+            }
+            
+            body {
+                font-size: 12pt;
+            }
+            
+            .guide-container {
+                max-width: 100%;
+                padding: 0;
+            }
+            
+            a {
+                text-decoration: none;
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>FeedbackForge</h1>
+            <p>Create personalised, effective feedback messages based on psychological research</p>
+        </div>
+    </header>
+
+    <main class="guide-container">
+        <div class="no-print">
+            <a href="index.html" class="secondary-button">&larr; Back to FeedbackForge</a>
+            <button class="primary-button" onclick="window.print()">Print Guide</button>
+        </div>
+        
+        <h1>FeedbackForge Quick Start Guide</h1>
+
+        <h2>What is FeedbackForge?</h2>
+        <p>FeedbackForge is an evidence-based feedback generation tool that helps managers craft personalized, effective feedback messages. Based on psychological research, FeedbackForge tailors feedback to:</p>
+        <ul>
+            <li>The recipient's communication style preferences</li>
+            <li>The specific context and purpose of the feedback</li>
+            <li>Research-backed principles of psychological safety</li>
+            <li>Structured feedback models that enhance clarity and impact</li>
+        </ul>
+
+        <h2>Getting Started in 5 Minutes</h2>
+        
+        <div class="guide-step">
+            <h3>Step 1: Choose Your Context</h3>
+            <ol>
+                <li><strong>Select the Feedback Type:</strong>
+                    <ul>
+                        <li><strong>Recognition</strong> - Acknowledge achievements and strengths</li>
+                        <li><strong>Improvement</strong> - Address areas that need development</li>
+                        <li><strong>Coaching</strong> - Guide progress toward specific goals</li>
+                        <li><strong>Developmental</strong> - Focus on long-term growth opportunities</li>
+                    </ul>
+                </li>
+                <li><strong>Select a Feedback Model:</strong>
+                    <ul>
+                        <li><strong>Simple</strong> - Basic strengths/improvements format</li>
+                        <li><strong>SBI (Situation-Behavior-Impact)</strong> - Connect specific behaviors to their outcomes</li>
+                        <li><strong>STAR (Situation-Task-Action-Result)</strong> - Link actions to achievements within a context</li>
+                    </ul>
+                </li>
+                <li>Choose a <strong>Delivery Method</strong> and <strong>Workplace Situation</strong> to further contextualize your feedback</li>
+            </ol>
+            <div class="guide-tip">Click "See examples" to view sample feedback for each type</div>
+        </div>
+        
+        <div class="guide-step">
+            <h3>Step 2: Understand Your Recipient</h3>
+            <ol>
+                <li>Enter the recipient's name and role</li>
+                <li>Select their <strong>Communication Style Preference</strong> (DISC framework):
+                    <ul>
+                        <li><strong>Direct (High D)</strong> - Prefers concise, results-focused communication</li>
+                        <li><strong>Interactive (High I)</strong> - Responds to enthusiastic, relationship-oriented messages</li>
+                        <li><strong>Supportive (High S)</strong> - Appreciates patient, methodical approaches</li>
+                        <li><strong>Analytical (High C)</strong> - Values detailed, logical explanations</li>
+                    </ul>
+                </li>
+            </ol>
+            <div class="guide-tip">Click "Learn about DISC styles" to see detailed guidance on each style</div>
+        </div>
+        
+        <div class="guide-step">
+            <h3>Step 3: Create Your Feedback Content</h3>
+            <ol>
+                <li>Complete the fields for your selected feedback model</li>
+                <li>Focus on observable behaviors and specific examples</li>
+                <li>Use the provided help text to guide your entries</li>
+                <li>Ensure at least one field has content</li>
+            </ol>
+            <div class="guide-tip">Click "See examples" to view model-specific examples that illustrate effective feedback</div>
+        </div>
+        
+        <div class="guide-step">
+            <h3>Step 4: Frame Your Feedback</h3>
+            <ol>
+                <li>Select <strong>Psychological Safety Elements</strong> to include:
+                    <ul>
+                        <li>Separate performance from identity</li>
+                        <li>Frame as learning opportunity</li>
+                        <li>Use collaborative approach</li>
+                        <li>Focus on future improvement</li>
+                    </ul>
+                </li>
+                <li>Choose an overall <strong>Tone</strong> that complements the recipient's communication style</li>
+                <li>Add a <strong>Follow-up Plan</strong> to show commitment to ongoing support</li>
+            </ol>
+        </div>
+        
+        <div class="guide-step">
+            <h3>Step 5: Generate and Refine</h3>
+            <ol>
+                <li>Review your settings in the summary</li>
+                <li>Click <strong>Preview Feedback</strong> to see and edit the draft</li>
+                <li>Click <strong>Generate Feedback</strong> to create the final version</li>
+                <li>Save as a template for future use (optional)</li>
+            </ol>
+        </div>
+
+        <h2>Working with Templates</h2>
+        <p>Templates allow you to save frequently used feedback configurations:</p>
+        <ol>
+            <li>To save a template, enter a name in the "Save as Template" field when generating feedback</li>
+            <li>To use a template, go to the Templates tab and click "Use Template"</li>
+            <li>To delete a template, go to the Templates tab and click "Delete"</li>
+        </ol>
+
+        <h2>Using Examples</h2>
+        <p>FeedbackForge provides various examples to help you craft effective feedback:</p>
+        <ol>
+            <li>Click "See examples" buttons throughout the form to view relevant examples</li>
+            <li>Use the "Example" buttons to see model-specific feedback samples</li>
+            <li>In the Templates tab, explore pre-built templates for common feedback scenarios</li>
+        </ol>
+
+        <h2>Additional Resources</h2>
+        
+        <h3>Research Base</h3>
+        <p>The Research tab provides information on the psychological principles behind FeedbackForge, including:</p>
+        <ul>
+            <li>Feedback models and their effectiveness</li>
+            <li>Communication style adaptation strategies</li>
+            <li>Psychological safety elements</li>
+            <li>Context-specific feedback approaches</li>
+        </ul>
+
+        <h3>Psychological Safety</h3>
+        <p>Creating psychological safety is essential for feedback effectiveness. FeedbackForge helps you:</p>
+        <ul>
+            <li>Focus on specific behaviors rather than personality traits</li>
+            <li>Frame feedback as opportunities for growth and development</li>
+            <li>Use collaborative language that positions you as a partner</li>
+            <li>Emphasize future improvement rather than dwelling on past issues</li>
+        </ul>
+
+        <h3>Need More Help?</h3>
+        <ul>
+            <li>Take the guided tour by clicking the "Take a guided tour" button</li>
+            <li>Explore the example buttons throughout the form</li>
+            <li>Visit the Research tab for more information on effective feedback</li>
+        </ul>
+
+        <h2>Feedback Best Practices</h2>
+        <ol>
+            <li><strong>Be specific</strong> - Use concrete examples and observed behaviors</li>
+            <li><strong>Be timely</strong> - Provide feedback as soon as reasonably possible</li>
+            <li><strong>Be balanced</strong> - Include both strengths and areas for improvement</li>
+            <li><strong>Be constructive</strong> - Focus on growth and development, not criticism</li>
+            <li><strong>Be empathetic</strong> - Consider the recipient's perspective and needs</li>
+            <li><strong>Be action-oriented</strong> - Include clear suggestions and next steps</li>
+            <li><strong>Be supportive</strong> - Offer resources and assistance for improvement</li>
+        </ol>
+
+        <p>Remember, effective feedback is a dialogue, not a monologue. Use FeedbackForge to create a foundation for meaningful conversations that drive growth and development.</p>
+        
+        <div class="guide-navigation no-print">
+            <a href="index.html" class="secondary-button">&larr; Back to FeedbackForge</a>
+            <button class="primary-button" onclick="window.print()">Print Guide</button>
+        </div>
+    </main>
+
+    <footer class="no-print">
+        <div class="container">
+            <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
+        </div>
+    </footer>
+</body>
+</html>
