@@ -2,7 +2,20 @@
   publish = "apps/coaching/public"
   functions = "apps/coaching/netlify/functions"
 
-# API redirects - Keeping force flag (!) to ensure they take precedence
+# First handle redirects to other apps
+[[redirects]]
+  from = "/feedback"
+  to = "https://feedbackforgedt.netlify.app/"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/feedback/*"
+  to = "https://feedbackforgedt.netlify.app/:splat"
+  status = 200
+  force = true
+
+# API redirects with force flag to ensure they take precedence
 [[redirects]]
   from = "/api/questions"
   to = "/.netlify/functions/fetch-questions"
@@ -35,6 +48,7 @@
   status = 200
 
 # Ensure all routes go to index.html for client-side routing
+# This must come LAST as it's the catch-all
 [[redirects]]
   from = "/*"
   to = "/index.html"
