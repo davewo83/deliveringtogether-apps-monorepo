@@ -1,9 +1,9 @@
 [build]
   # Root site settings for coaching app
-  publish = "apps/coaching/public"
-  functions = "apps/coaching/netlify/functions"
+  publish = "${PUBLISH_DIR:-apps/coaching/public}"
+  functions = "${FUNCTIONS_DIR:-apps/coaching/netlify/functions}"
   # Only build when coaching app files change
-  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/coaching/"
+  ignore = "${IGNORE_PATH:-git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF apps/coaching/}"
 
 # Feedback app redirects with resources explicitly handled
 [[redirects]]
