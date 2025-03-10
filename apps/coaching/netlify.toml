@@ -15,7 +15,7 @@
   status = 200
   force = true
 
-# API redirects with force flag to ensure they take precedence
+# API redirects with forceflag to ensure they take precedence
 [[redirects]]
   from = "/api/questions"
   to = "/.netlify/functions/fetch-questions"
