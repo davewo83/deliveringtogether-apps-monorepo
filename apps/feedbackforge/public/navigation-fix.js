@@ -1,6 +1,6 @@
 /**
- * Fix for form navigation buttons
- * Add this script to your page to fix the navigation between form sections
+ * Fixed navigation script for FeedbackForge
+ * This script fixes the navigation between form sections
  */
 
 // Execute this script after the page has loaded
@@ -37,8 +37,16 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Fix for specific "Next: Recipient Information" button
-    const nextRecipientBtn = document.querySelector('button:contains("Next: Recipient Information")');
+    // Find the "Next: Recipient Information" button using standard DOM traversal
+    const allButtons = document.querySelectorAll('button');
+    let nextRecipientBtn = null;
+    
+    allButtons.forEach(button => {
+        if (button.textContent.includes("Next: Recipient Information")) {
+            nextRecipientBtn = button;
+        }
+    });
+    
     if (nextRecipientBtn) {
         nextRecipientBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -173,37 +181,5 @@ document.addEventListener('DOMContentLoaded', function() {
                 step.classList.add('completed');
             }
         });
-    }
-    
-    // Add utility method to help with text content selection
-    if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.webkitMatchesSelector;
-    }
-    
-    if (!Element.prototype.closest) {
-        Element.prototype.closest = function(s) {
-            var el = this;
-            do {
-                if (el.matches(s)) return el;
-                el = el.parentElement || el.parentNode;
-            } while (el !== null && el.nodeType === 1);
-            return null;
-        };
-    }
-    
-    if (!window.jQuery) {
-        // Add a simple :contains selector
-        document.querySelectorAll = function(selector) {
-            if (selector.includes(':contains(')) {
-                const parts = selector.match(/^([^:]+):contains\(([^)]+)\)$/);
-                if (parts) {
-                    const [_, elementSelector, text] = parts;
-                    const elements = document.querySelectorAll(elementSelector || '*');
-                    return Array.from(elements).filter(el => 
-                        el.textContent.includes(text.replace(/["']/g, '')));
-                }
-            }
-            return document.querySelectorAll.apply(document, arguments);
-        };
     }
 });
