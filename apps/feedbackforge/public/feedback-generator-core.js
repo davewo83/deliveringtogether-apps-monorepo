@@ -204,6 +204,122 @@ function generateSimpleFeedback(data) {
 }
 
 /**
+ * Add psychological safety elements to the feedback script based on selected options
+ * @param {Array} psychSafetyElements - Selected psychological safety elements
+ * @param {string} feedbackType - Type of feedback (recognition, improvement, etc.)
+ * @returns {string} - Formatted psychological safety content
+ */
+function generatePsychologicalSafetyContent(psychSafetyElements, feedbackType) {
+    let psychSafetyContent = '';
+    
+    // Use different approaches based on feedback type
+    if (feedbackType === 'recognition') {
+        // For recognition feedback, use affirming language
+        if (psychSafetyElements.includes('separate-identity')) {
+            psychSafetyContent += "These accomplishments reflect your dedicated approach and commitment to excellence. ";
+        }
+        
+        if (psychSafetyElements.includes('learning-opportunity')) {
+            psychSafetyContent += "Success like this creates a foundation for continued growth and development. ";
+        }
+        
+        if (psychSafetyElements.includes('collaborative')) {
+            psychSafetyContent += "I appreciate how we've been able to work together in this area. ";
+        }
+        
+        if (psychSafetyElements.includes('future-focused')) {
+            psychSafetyContent += "I'm looking forward to seeing how you'll build on these strengths moving forward. ";
+        }
+    } else {
+        // For improvement, coaching, developmental feedback, use protective language
+        if (psychSafetyElements.includes('separate-identity')) {
+            psychSafetyContent += "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person. ";
+        }
+        
+        if (psychSafetyElements.includes('learning-opportunity')) {
+            psychSafetyContent += "I see this as an opportunity for learning and growth. ";
+        }
+        
+        if (psychSafetyElements.includes('collaborative')) {
+            psychSafetyContent += "I'd like us to work together on addressing these points. ";
+        }
+        
+        if (psychSafetyElements.includes('future-focused')) {
+            psychSafetyContent += "Let's focus on how we can move forward from here. ";
+        }
+    }
+    
+    return psychSafetyContent;
+}
+
+/**
+ * Creates a complete feedback script with opening/closing
+ * @param {Object} data - Form data
+ * @param {string} contentBody - Main feedback content
+ * @param {Array} psychSafetyElements - Selected psychological safety elements
+ * @returns {string} - Complete feedback script
+ */
+function generateCompleteScript(data, contentBody, psychSafetyElements) {
+    const { 
+        recipientName, 
+        personalityType, 
+        workplaceSituation,
+        feedbackType,
+        deliveryMethod,
+        tone,
+        followUp
+    } = data;
+    
+    // Generate date in UK format (DD/MM/YYYY)
+    const today = new Date();
+    const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+    
+    // Start the script
+    let script = `Feedback for: ${recipientName || 'Team Member'}\nDate: ${formattedDate}\n\n`;
+    
+    // Add greeting
+    script += `Dear ${recipientName || 'Team Member'},\n\n`;
+    
+    // Add opening statement based on personality type and situation
+    script += getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
+    script += '\n\n';
+    
+    // Add main feedback content
+    script += contentBody;
+    script += '\n\n';
+    
+    // Add psychological safety elements - USING THE NEW HELPER FUNCTION
+    const psychSafetyContent = generatePsychologicalSafetyContent(psychSafetyElements, feedbackType);
+    if (psychSafetyContent) {
+        script += psychSafetyContent + '\n\n';
+    }
+    
+    // Add follow-up plan if provided
+    if (followUp) {
+        script += `For follow-up, ${followUp}\n\n`;
+    }
+    
+    // Add delivery method specific text
+    if (deliveryMethod === 'written') {
+        script += "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready. ";
+    } else if (deliveryMethod === 'remote') {
+        script += "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person. ";
+    }
+    
+    if (deliveryMethod !== 'face-to-face') {
+        script += '\n\n';
+    }
+    
+    // Add closing statement based on personality type
+    script += getClosingStatement(personalityType, feedbackType);
+    
+    // Add formal closing
+    script += '\n\nBest regards,\n[Your Name]';
+    
+    return script;
+}
+
+/**
  * Creates a complete feedback script with opening/closing
  * @param {Object} data - Form data
  * @param {string} contentBody - Main feedback content
