@@ -204,7 +204,7 @@ function generateSimpleFeedback(data) {
 }
 
 /**
- * Creates a complete feedback script with context-appropriate safety elements
+ * Creates a complete feedback script with opening/closing
  * @param {Object} data - Form data
  * @param {string} contentBody - Main feedback content
  * @param {Array} psychSafetyElements - Selected psychological safety elements
@@ -239,31 +239,32 @@ function generateCompleteScript(data, contentBody, psychSafetyElements) {
     script += contentBody;
     script += '\n\n';
     
-    // Add psychological safety elements - ADAPTED BASED ON FEEDBACK TYPE
+    // FIXED: Add feedback-type specific psychological safety elements
     let psychSafetyContent = '';
     
-    // For recognition feedback, use different approaches to psychological safety
+    // Check if this is recognition feedback - requires different approach
     if (feedbackType === 'recognition') {
         if (psychSafetyElements && psychSafetyElements.includes('separate-identity')) {
-            // For recognition, we don't need to separate performance from identity
-            // Instead, reinforce connection between their actions and success
+            // For recognition, don't separate identity from performance
             psychSafetyContent += "These accomplishments reflect your dedicated approach and commitment to excellence. ";
         }
         
         if (psychSafetyElements && psychSafetyElements.includes('learning-opportunity')) {
-            // For recognition, reframe learning as continued growth from strength
+            // For recognition, frame learning as building on success
             psychSafetyContent += "Success like this creates a foundation for continued growth and development. ";
         }
         
         if (psychSafetyElements && psychSafetyElements.includes('collaborative')) {
+            // For recognition, highlight collaboration differently
             psychSafetyContent += "I appreciate how we've been able to work together in this area. ";
         }
         
         if (psychSafetyElements && psychSafetyElements.includes('future-focused')) {
+            // For recognition, future focus is about building on strengths
             psychSafetyContent += "I'm looking forward to seeing how you'll build on these strengths moving forward. ";
         }
     } 
-    // For improvement, coaching, and developmental feedback, use standard elements
+    // For improvement, coaching, and developmental feedback, use original elements
     else {
         if (psychSafetyElements && psychSafetyElements.includes('separate-identity')) {
             psychSafetyContent += "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person. ";
