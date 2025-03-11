@@ -375,17 +375,21 @@
          * @param {number} exampleId - ID of the example
          */
         populateWithExample: function(exampleType, exampleId) {
-            // If examples haven't loaded yet, show an error
+            console.log('Showing example:', exampleType, exampleId);
+            
+            // If examples haven't loaded yet, show loading message
             if (!FeedbackForgeState.examples) {
-                console.error('Examples data not loaded yet');
+                console.log('Examples data not loaded yet');
                 UIController.showModal(
-                    'Examples Not Available',
-                    '<p>Sorry, the examples data is still loading. Please try again in a moment.</p>'
+                    'Loading Examples',
+                    '<p>Loading example data... Please try again in a moment.</p>'
                 );
                 return;
             }
 
             let exampleData;
+            let modalContent = '';
+            let modalTitle = 'Example';
             
             // Determine which example to use
             switch(exampleType) {
@@ -394,20 +398,21 @@
                     const examples = FeedbackForgeState.examples.feedbackTypes[feedbackType];
                     
                     if (!examples || examples.length === 0) {
-                        UIController.showModal(
-                            'Example Not Available',
-                            `<p>No examples available for the ${feedbackType} feedback type.</p>`
-                        );
-                        return;
+                        modalTitle = 'Example Not Available';
+                        modalContent = `<p>No examples available for the ${feedbackType} feedback type.</p>`;
+                        break;
                     }
                     
                     exampleData = examples[exampleId % examples.length];
-                    
-                    UIController.showModal(
-                        `Example: ${exampleData.title}`,
-                        `<div class="example-box">${exampleData.content}</div>`
-                    );
-                    return;
+                    modalTitle = `Example: ${exampleData.title}`;
+                    modalContent = `
+                        <div class="example-section">
+                            <div class="example-box">
+                                <p>${exampleData.content}</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
                     
                 case 'discStyle':
                     const personalityType = document.getElementById('personality-type').value;
@@ -415,49 +420,87 @@
                     
                     if (!FeedbackForgeState.examples.discStyles[personalityType] || 
                         !FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc]) {
-                        UIController.showModal(
-                            'Example Not Available',
-                            `<p>No examples available for the ${personalityType} communication style with ${feedbackTypeForDisc} feedback.</p>`
-                        );
-                        return;
+                        modalTitle = 'Example Not Available';
+                        modalContent = `<p>No examples available for the ${personalityType} communication style with ${feedbackTypeForDisc} feedback.</p>`;
+                        break;
                     }
                     
-                    exampleData = {
-                        content: FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc]
-                    };
-                    
-                    UIController.showModal(
-                        `Example: ${UIController.getCommunicationStyleName(personalityType)} Communication Style`,
-                        `<div class="example-box">${exampleData.content}</div>`
-                    );
-                    return;
+                    const styleContent = FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc];
+                    modalTitle = `Example: ${UIController.getCommunicationStyleName(personalityType)} Communication Style`;
+                    modalContent = `
+                        <div class="example-section">
+                            <div class="example-box">
+                                <p>${styleContent}</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
                     
                 case 'complete':
                     // Get a complete example based on selected model
                     const feedbackModel = document.getElementById('feedback-model').value;
                     
                     if (!FeedbackForgeState.examples.feedbackModels[feedbackModel]) {
-                        UIController.showModal(
-                            'Example Not Available',
-                            `<p>No complete examples available for the ${feedbackModel} model.</p>`
-                        );
-                        return;
+                        modalTitle = 'Example Not Available';
+                        modalContent = `<p>No complete examples available for the ${feedbackModel} model.</p>`;
+                        break;
                     }
                     
                     exampleData = FeedbackForgeState.examples.feedbackModels[feedbackModel];
+                    modalTitle = `Complete Example: ${exampleData.title || UIController.getModelName(feedbackModel)}`;
+                    
+                    // For complete examples, we could either show them or offer to populate the form
+                    modalContent = `
+                        <div class="example-section">
+                            <p>This is a complete example of the ${UIController.getModelName(feedbackModel)} feedback model.</p>
+                            <div class="example-box">
+                                <p><strong>Context:</strong> ${this.formatCompleteExample(exampleData)}</p>
+                            </div>
+                            <p>Would you like to use this example to populate the form?</p>
+                            <button id="populate-example" class="primary-button">Use This Example</button>
+                        </div>
+                    `;
                     break;
                     
                 default:
-                    return;
+                    modalTitle = 'Example Not Available';
+                    modalContent = '<p>No example available for this type.</p>';
             }
             
-            // For complete examples, populate the form
-            if (exampleData) {
-                // First confirm with user
-                if (confirm("This will replace your current form data with an example. Continue?")) {
-                    this.populateForm(exampleData);
-                }
+            // Show the modal with example content
+            UIController.showModal(modalTitle, modalContent);
+            
+            // Add event listener for the populate button if it exists
+            if (exampleType === 'complete' && exampleData) {
+                setTimeout(() => {
+                    document.getElementById('populate-example')?.addEventListener('click', () => {
+                        this.populateForm(exampleData);
+                        UIController.closeModal();
+                    });
+                }, 100);
             }
+        },
+
+        /**
+         * Format a complete example for display
+         * @param {Object} example - The complete example data
+         * @returns {string} - Formatted HTML
+         */
+        formatCompleteExample: function(example) {
+            let html = '';
+            
+            if (example.context) {
+                html += `${UIController.getFeedbackTypeName(example.context.feedbackType)} feedback, `;
+                html += `delivered ${example.context.deliveryMethod}, `;
+                html += `during ${UIController.getSituationName(example.context.workplaceSituation)}`;
+            }
+            
+            if (example.recipient) {
+                html += `<br><br><strong>Recipient:</strong> ${example.recipient.name} (${example.recipient.role})<br>`;
+                html += `<strong>Communication Style:</strong> ${UIController.getCommunicationStyleName(example.recipient.personalityType)}`;
+            }
+            
+            return html;
         },
         
         /**
@@ -694,8 +737,12 @@
         setupExampleButtons: function() {
             // Handle example buttons
             document.querySelectorAll('.example-button').forEach(button => {
-                button.addEventListener('click', function() {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent any default action
+                    e.stopPropagation(); // Prevent event bubbling
+                    
                     const exampleType = this.dataset.example;
+                    console.log('Example button clicked:', exampleType);
                     
                     if (exampleType === 'feedback-type') {
                         // Show an example of the currently selected feedback type
@@ -1517,6 +1564,58 @@
         },
         
         /**
+         * Show a modal with custom title and content
+         * @param {string} title - Modal title
+         * @param {string} content - Modal HTML content
+         */
+        showModal: function(title, content) {
+            const modalTitle = document.getElementById('modal-title');
+            const modalContent = document.getElementById('modal-content');
+            const modalContainer = document.getElementById('modal-container');
+            
+            if (!modalTitle || !modalContent || !modalContainer) {
+                console.error('Modal elements not found in the DOM');
+                return;
+            }
+            
+            // Set content
+            modalTitle.textContent = title;
+            modalContent.innerHTML = content;
+            
+            // Show modal
+            modalContainer.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+            
+            // Ensure close button works
+            document.querySelector('.close-modal')?.addEventListener('click', this.closeModal);
+            
+            // Close when clicking outside
+            modalContainer.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    UIController.closeModal();
+                }
+            });
+            
+            // Close on escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && modalContainer.classList.contains('active')) {
+                    UIController.closeModal();
+                }
+            });
+        },
+        
+        /**
+         * Close the modal dialog
+         */
+        closeModal: function() {
+            const modalContainer = document.getElementById('modal-container');
+            if (modalContainer) {
+                modalContainer.classList.remove('active');
+                document.body.style.overflow = ''; // Restore scrolling
+            }
+        },
+        
+        /**
          * Set up guided tour button
          */
         setupGuidedTour: function() {
@@ -1766,33 +1865,6 @@
                     FeedbackForgeState.reset();
                     resultsContainer.innerHTML = '';
                 });
-            }
-        },
-        
-        /**
-         * Show a modal with custom title and content
-         * @param {string} title - Modal title
-         * @param {string} content - Modal HTML content
-         */
-        showModal: function(title, content) {
-            const modalTitle = document.getElementById('modal-title');
-            const modalContent = document.getElementById('modal-content');
-            const modalContainer = document.getElementById('modal-container');
-            
-            if (!modalTitle || !modalContent || !modalContainer) return;
-            
-            modalTitle.textContent = title;
-            modalContent.innerHTML = content;
-            modalContainer.classList.add('active');
-        },
-        
-        /**
-         * Close the modal dialog
-         */
-        closeModal: function() {
-            const modalContainer = document.getElementById('modal-container');
-            if (modalContainer) {
-                modalContainer.classList.remove('active');
             }
         },
         
@@ -2185,5 +2257,4 @@
     document.addEventListener('DOMContentLoaded', function() {
         FeedbackForgeApp.init();
     });
-
 })();
