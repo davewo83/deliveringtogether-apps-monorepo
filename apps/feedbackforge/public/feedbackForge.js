@@ -8,10 +8,7 @@
  * - disc-integration.js
  * - form-streamline.js
  * - navigation-fix.js
- * 
- * Maintains compatibility with:
- * - examples-data.js
- * - test-integration.js
+ * - examples-data.js (now integrated)
  */
 
 // Immediately-Invoked Function Expression to avoid polluting global scope
@@ -73,6 +70,9 @@
         
         // Templates
         templates: {},
+
+        // Examples data
+        examples: null,
         
         // Event subscribers
         subscribers: [],
@@ -94,6 +94,36 @@
             
             // Add default listeners
             this.subscribe(UIController.update);
+
+            // Load examples data
+            this.loadExamples();
+        },
+
+        /**
+         * Load examples from JSON file
+         */
+        loadExamples: function() {
+            fetch('examples.json')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    this.examples = data;
+                    console.log('Examples loaded successfully');
+                    this.notify();
+                })
+                .catch(error => {
+                    console.error('Error loading examples:', error);
+                    // Fallback to empty examples object if file can't be loaded
+                    this.examples = {
+                        feedbackTypes: {},
+                        discStyles: {},
+                        feedbackModels: {}
+                    };
+                });
         },
         
         /**
@@ -335,6 +365,183 @@
     };
 
     /**
+     * Examples Module
+     * Handles example display and form population
+     */
+    const ExamplesModule = {
+        /**
+         * Show an example based on the type and ID
+         * @param {string} exampleType - Type of example to show
+         * @param {number} exampleId - ID of the example
+         */
+        populateWithExample: function(exampleType, exampleId) {
+            // If examples haven't loaded yet, show an error
+            if (!FeedbackForgeState.examples) {
+                console.error('Examples data not loaded yet');
+                UIController.showModal(
+                    'Examples Not Available',
+                    '<p>Sorry, the examples data is still loading. Please try again in a moment.</p>'
+                );
+                return;
+            }
+
+            let exampleData;
+            
+            // Determine which example to use
+            switch(exampleType) {
+                case 'feedbackType':
+                    const feedbackType = document.getElementById('feedback-type').value;
+                    const examples = FeedbackForgeState.examples.feedbackTypes[feedbackType];
+                    
+                    if (!examples || examples.length === 0) {
+                        UIController.showModal(
+                            'Example Not Available',
+                            `<p>No examples available for the ${feedbackType} feedback type.</p>`
+                        );
+                        return;
+                    }
+                    
+                    exampleData = examples[exampleId % examples.length];
+                    
+                    UIController.showModal(
+                        `Example: ${exampleData.title}`,
+                        `<div class="example-box">${exampleData.content}</div>`
+                    );
+                    return;
+                    
+                case 'discStyle':
+                    const personalityType = document.getElementById('personality-type').value;
+                    const feedbackTypeForDisc = document.getElementById('feedback-type').value;
+                    
+                    if (!FeedbackForgeState.examples.discStyles[personalityType] || 
+                        !FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc]) {
+                        UIController.showModal(
+                            'Example Not Available',
+                            `<p>No examples available for the ${personalityType} communication style with ${feedbackTypeForDisc} feedback.</p>`
+                        );
+                        return;
+                    }
+                    
+                    exampleData = {
+                        content: FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc]
+                    };
+                    
+                    UIController.showModal(
+                        `Example: ${UIController.getCommunicationStyleName(personalityType)} Communication Style`,
+                        `<div class="example-box">${exampleData.content}</div>`
+                    );
+                    return;
+                    
+                case 'complete':
+                    // Get a complete example based on selected model
+                    const feedbackModel = document.getElementById('feedback-model').value;
+                    
+                    if (!FeedbackForgeState.examples.feedbackModels[feedbackModel]) {
+                        UIController.showModal(
+                            'Example Not Available',
+                            `<p>No complete examples available for the ${feedbackModel} model.</p>`
+                        );
+                        return;
+                    }
+                    
+                    exampleData = FeedbackForgeState.examples.feedbackModels[feedbackModel];
+                    break;
+                    
+                default:
+                    return;
+            }
+            
+            // For complete examples, populate the form
+            if (exampleData) {
+                // First confirm with user
+                if (confirm("This will replace your current form data with an example. Continue?")) {
+                    this.populateForm(exampleData);
+                }
+            }
+        },
+        
+        /**
+         * Populate form with example data
+         * @param {Object} data - Example data to populate the form with
+         */
+        populateForm: function(data) {
+            const form = document.getElementById('feedback-form');
+            
+            // Reset form first
+            form.reset();
+            
+            // Populate context fields
+            if (data.context) {
+                document.getElementById('feedback-type').value = data.context.feedbackType || 'recognition';
+                document.getElementById('feedback-model').value = data.context.feedbackModel || 'simple';
+                document.getElementById('delivery-method').value = data.context.deliveryMethod || 'face-to-face';
+                document.getElementById('workplace-situation').value = data.context.workplaceSituation || 'normal';
+                
+                // Trigger model fields visibility update
+                const event = new Event('change');
+                document.getElementById('feedback-model').dispatchEvent(event);
+            }
+            
+            // Populate recipient fields
+            if (data.recipient) {
+                document.getElementById('recipient-name').value = data.recipient.name || '';
+                document.getElementById('recipient-role').value = data.recipient.role || '';
+                document.getElementById('personality-type').value = data.recipient.personalityType || 'D';
+            }
+            
+            // Populate content fields based on model
+            if (data.content) {
+                const model = document.getElementById('feedback-model').value;
+                
+                switch(model) {
+                    case 'simple':
+                        document.getElementById('specific-strengths').value = data.content.specificStrengths || '';
+                        document.getElementById('areas-improvement').value = data.content.areasForImprovement || '';
+                        document.getElementById('support-offered').value = data.content.supportOffered || '';
+                        break;
+                        
+                    case 'sbi':
+                        document.getElementById('situation').value = data.content.situation || '';
+                        document.getElementById('behavior').value = data.content.behavior || '';
+                        document.getElementById('impact').value = data.content.impact || '';
+                        break;
+                        
+                    case 'star':
+                        document.getElementById('star-situation').value = data.content.starSituation || '';
+                        document.getElementById('task').value = data.content.task || '';
+                        document.getElementById('action').value = data.content.action || '';
+                        document.getElementById('result').value = data.content.result || '';
+                        break;
+                }
+            }
+            
+            // Populate framing fields
+            if (data.framing) {
+                document.getElementById('tone').value = data.framing.tone || 'supportive';
+                document.getElementById('follow-up').value = data.framing.followUp || '';
+                
+                // Reset checkboxes first
+                document.querySelectorAll('input[name="psychSafetyElements"]').forEach(cb => {
+                    cb.checked = false;
+                });
+                
+                // Set selected psychological safety elements
+                if (data.framing.psychSafetyElements && Array.isArray(data.framing.psychSafetyElements)) {
+                    data.framing.psychSafetyElements.forEach(element => {
+                        const checkbox = document.querySelector(`input[name="psychSafetyElements"][value="${element}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                }
+            }
+            
+            // Update UI if FeedbackForgeState is available
+            FeedbackForgeState.update('ui', { currentSection: 'context' });
+        }
+    };
+
+    /**
      * Form Handler
      * Handles form validation and submission
      */
@@ -345,6 +552,7 @@
         init: function() {
             this.setupFormElements();
             this.setupFormEvents();
+            this.setupExampleButtons();
         },
         
         /**
@@ -477,6 +685,32 @@
                 
                 // Show the default model fields
                 this.updateModelFields('simple');
+            });
+        },
+
+        /**
+         * Set up example buttons and related functionality
+         */
+        setupExampleButtons: function() {
+            // Handle example buttons
+            document.querySelectorAll('.example-button').forEach(button => {
+                button.addEventListener('click', function() {
+                    const exampleType = this.dataset.example;
+                    
+                    if (exampleType === 'feedback-type') {
+                        // Show an example of the currently selected feedback type
+                        ExamplesModule.populateWithExample('feedbackType', Math.floor(Math.random() * 3));
+                    } else if (exampleType === 'disc-styles') {
+                        // Show disc style examples
+                        ExamplesModule.populateWithExample('discStyle', 0);
+                    } else if (exampleType === 'feedback-model') {
+                        // Show a complete example for the current model
+                        ExamplesModule.populateWithExample('complete', 0);
+                    } else {
+                        // For other example types, use the UI controller
+                        UIController.showExampleModal(exampleType);
+                    }
+                });
             });
         },
         
@@ -1144,7 +1378,6 @@
         init: function() {
             this.setupTabs();
             this.setupModalHandling();
-            this.setupExampleButtons();
             this.setupGuidedTour();
             this.setupTemplatesSystem();
         },
@@ -1280,18 +1513,6 @@
                 if (e.target === this) {
                     UIController.closeModal();
                 }
-            });
-        },
-        
-        /**
-         * Set up example buttons
-         */
-        setupExampleButtons: function() {
-            document.querySelectorAll('.example-button').forEach(button => {
-                button.addEventListener('click', function() {
-                    const exampleType = this.dataset.example;
-                    UIController.showExampleModal(exampleType);
-                });
             });
         },
         
@@ -1580,93 +1801,70 @@
          * @param {string} exampleType - Type of example to show
          */
         showExampleModal: function(exampleType) {
-            // Implementation depends on examples-data.js
-            // As a fallback, show a basic info modal
+            // Implementation for special example types that aren't in the examples.json
             let title = "Example";
             let content = "Examples will be available in the full version.";
             
             switch(exampleType) {
-                case 'feedback-type':
-                    title = "Feedback Type Examples";
+                case 'psych-safety':
+                    title = "Psychological Safety in Feedback";
                     content = `
                         <div class="example-section">
-                            <h4>Recognition Feedback</h4>
+                            <p>Psychological safety is essential for feedback to be received effectively. Here's how each element enhances psychological safety:</p>
+                            
+                            <h4>Separate Performance from Identity</h4>
                             <div class="example-box">
-                                <p>I wanted to acknowledge your excellent work on the quarterly report. Your attention to detail and thorough analysis provided exactly what the leadership team needed to make informed decisions. This kind of work really highlights your analytical strengths.</p>
+                                <p><strong>What it means:</strong> Focus feedback on specific behaviors and actions rather than personality traits or character.</p>
+                                <p><strong>Example:</strong> "When the report was submitted without all sections completed, it created challenges for the review team" rather than "You're careless with your work."</p>
                             </div>
                             
-                            <h4>Improvement Feedback</h4>
+                            <h4>Frame as Learning Opportunity</h4>
                             <div class="example-box">
-                                <p>I've noticed that the last few client presentations would benefit from more preparation. When we create more structured presentations with clear talking points, our clients tend to respond more positively. I believe with some adjustments to your preparation process, you can make an even stronger impact.</p>
+                                <p><strong>What it means:</strong> Present feedback as a chance to develop and improve rather than as criticism.</p>
+                                <p><strong>Example:</strong> "This presentation gives us a chance to explore how technical information can be made more accessible to non-technical stakeholders" rather than "Your presentation was too technical."</p>
                             </div>
                             
-                            <h4>Coaching Feedback</h4>
+                            <h4>Use Collaborative Approach</h4>
                             <div class="example-box">
-                                <p>As we discussed in your development plan, building stronger project management skills is a key goal this quarter. I've observed that while you're excellent at individual tasks, there's an opportunity to strengthen how you track dependencies across the team. Let's work together on a system that will help you monitor the overall project progress more effectively.</p>
+                                <p><strong>What it means:</strong> Position feedback as a shared journey rather than one-directional instruction.</p>
+                                <p><strong>Example:</strong> "Let's work together to find ways to streamline the approval process" rather than "You need to make your approval process faster."</p>
                             </div>
                             
-                            <h4>Developmental Feedback</h4>
+                            <h4>Focus on Future Improvement</h4>
                             <div class="example-box">
-                                <p>Looking at your long-term career goals, I see an opportunity for you to develop your strategic thinking skills. Currently, you excel at tactical execution, but to move toward the leadership role you're interested in, we should focus on building your ability to see the bigger picture and connect our work to broader business objectives.</p>
+                                <p><strong>What it means:</strong> Emphasize forward movement rather than dwelling on past mistakes.</p>
+                                <p><strong>Example:</strong> "For the next client meeting, what strategies could we use to ensure all stakeholders' questions are addressed?" rather than "You didn't answer all the client's questions in the last meeting."</p>
                             </div>
                         </div>
                     `;
                     break;
-                case 'disc-styles':
-                    title = "DISC Communication Styles";
+                
+                case 'feedback-model':
+                    title = "Feedback Models";
                     content = `
                         <div class="example-section">
-                            <p>The DISC framework helps understand different communication preferences and adapt your feedback accordingly.</p>
+                            <p>Different feedback models provide structured frameworks for organizing your feedback:</p>
                             
-                            <div class="example-disc">
-                                <div class="disc-type">
-                                    <h4>Direct (High D)</h4>
-                                    <ul>
-                                        <li>Focus on results and outcomes</li>
-                                        <li>Be brief and to the point</li>
-                                        <li>Emphasize efficiency and impact</li>
-                                        <li>Provide clear action steps</li>
-                                        <li>Don't waste time with small talk</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="disc-type">
-                                    <h4>Interactive (High I)</h4>
-                                    <ul>
-                                        <li>Show enthusiasm and energy</li>
-                                        <li>Focus on people and relationships</li>
-                                        <li>Use stories and examples</li>
-                                        <li>Provide opportunities for discussion</li>
-                                        <li>Acknowledge their ideas and creativity</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="disc-type">
-                                    <h4>Supportive (High S)</h4>
-                                    <ul>
-                                        <li>Be patient and methodical</li>
-                                        <li>Provide step-by-step explanations</li>
-                                        <li>Emphasize stability and consistency</li>
-                                        <li>Show genuine appreciation</li>
-                                        <li>Avoid pushing for immediate change</li>
-                                    </ul>
-                                </div>
-                                
-                                <div class="disc-type">
-                                    <h4>Analytical (High C)</h4>
-                                    <ul>
-                                        <li>Provide detailed information</li>
-                                        <li>Present logical explanations</li>
-                                        <li>Use data and evidence</li>
-                                        <li>Focus on quality and accuracy</li>
-                                        <li>Allow time for processing</li>
-                                    </ul>
-                                </div>
+                            <h4>Simple Model</h4>
+                            <div class="example-box">
+                                <p>A straightforward approach focusing on strengths, areas for improvement, and support offered.</p>
+                                <p><strong>Example:</strong> "I've noticed your strengths in building client relationships. I believe we could work together on developing more detailed documentation to support these relationships. To help with this, I'd be happy to share some documentation templates and review your first drafts."</p>
+                            </div>
+                            
+                            <h4>Situation-Behavior-Impact (SBI)</h4>
+                            <div class="example-box">
+                                <p>A structured model that describes the context, specific behaviors observed, and their effects.</p>
+                                <p><strong>Example:</strong> "In yesterday's team meeting, when you took time to acknowledge each team member's contribution to the project, I observed that participation increased significantly for the remainder of the meeting, and several new ideas emerged that we hadn't previously considered."</p>
+                            </div>
+                            
+                            <h4>Situation-Task-Action-Result (STAR)</h4>
+                            <div class="example-box">
+                                <p>A comprehensive model that examines the context, objectives, actions taken, and outcomes.</p>
+                                <p><strong>Example:</strong> "In the recent system outage, where we needed to restore service quickly while identifying the root cause, you methodically prioritized critical systems, delegated investigation tasks appropriately, and maintained calm communication throughout. This resulted in restoring service 40% faster than our target time and identifying a previously unknown vulnerability."</p>
                             </div>
                         </div>
                     `;
                     break;
-                // Add more example types as needed
             }
             
             this.showModal(title, content);
@@ -1922,7 +2120,6 @@
      */
     const DISCModule = {
         // If you need to access DISC_PROFILES data, it can be initialized here
-        // or imported from disc-integration.js
         
         /**
          * Initialize DISC module
@@ -1964,7 +2161,8 @@
             window.UIController = {
                 showModal: UIController.showModal,
                 closeModal: UIController.closeModal,
-                showTourStep: UIController.showTourStep
+                showTourStep: UIController.showTourStep,
+                getCommunicationStyleName: UIController.getCommunicationStyleName
             };
             
             // Make key functions available globally for integration with existing code
@@ -1973,80 +2171,13 @@
             window.getModelName = UIController.getModelName;
             window.getCommunicationStyleName = UIController.getCommunicationStyleName;
             window.getToneName = UIController.getToneName;
+
+            // Make examples functionality available globally
+            window.populateWithExample = ExamplesModule.populateWithExample.bind(ExamplesModule);
+            window.populateForm = ExamplesModule.populateForm.bind(ExamplesModule);
             
-            // Add compatibility with examples-data.js
-            window.populateForm = function(data) {
-                // Reset form first
-                FeedbackForgeState.reset();
-                
-                // Update state with example data
-                if (data.context) {
-                    FeedbackForgeState.update('formData', {
-                        feedbackType: data.context.feedbackType || 'recognition',
-                        feedbackModel: data.context.feedbackModel || 'simple',
-                        deliveryMethod: data.context.deliveryMethod || 'face-to-face',
-                        workplaceSituation: data.context.workplaceSituation || 'normal'
-                    });
-                }
-                
-                if (data.recipient) {
-                    FeedbackForgeState.update('formData', {
-                        recipientName: data.recipient.name || '',
-                        recipientRole: data.recipient.role || '',
-                        personalityType: data.recipient.personalityType || 'D'
-                    });
-                }
-                
-                if (data.content) {
-                    const model = FeedbackForgeState.formData.feedbackModel;
-                    
-                    if (model === 'simple' && data.content.specificStrengths) {
-                        FeedbackForgeState.update('formData', {
-                            simple: {
-                                specificStrengths: data.content.specificStrengths || '',
-                                areasForImprovement: data.content.areasForImprovement || '',
-                                supportOffered: data.content.supportOffered || ''
-                            }
-                        });
-                    } else if (model === 'sbi' && data.content.situation) {
-                        FeedbackForgeState.update('formData', {
-                            sbi: {
-                                situation: data.content.situation || '',
-                                behavior: data.content.behavior || '',
-                                impact: data.content.impact || ''
-                            }
-                        });
-                    } else if (model === 'star' && data.content.starSituation) {
-                        FeedbackForgeState.update('formData', {
-                            star: {
-                                situation: data.content.starSituation || '',
-                                task: data.content.task || '',
-                                action: data.content.action || '',
-                                result: data.content.result || ''
-                            }
-                        });
-                    }
-                }
-                
-                if (data.framing) {
-                    FeedbackForgeState.update('formData', {
-                        tone: data.framing.tone || 'supportive',
-                        followUp: data.framing.followUp || ''
-                    });
-                    
-                    if (data.framing.psychSafetyElements && Array.isArray(data.framing.psychSafetyElements)) {
-                        FeedbackForgeState.update('formData', {
-                            psychSafetyElements: data.framing.psychSafetyElements
-                        });
-                    }
-                }
-                
-                // Update UI to reflect changes
-                FormHandler.populateFormFromState();
-                
-                // Show first section
-                FeedbackForgeState.update('ui', { currentSection: 'context' });
-            };
+            // Make FeedbackForgeState available globally for backward compatibility
+            window.FeedbackForgeState = FeedbackForgeState;
         }
     };
 
