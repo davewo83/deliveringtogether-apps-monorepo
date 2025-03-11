@@ -1,6 +1,6 @@
 /**
  * FeedbackForge - Core Functionality
- * This script implements the core feedback generation functionality
+ * This script implements the core feedback gen functionality
  */
 
 document.addEventListener('DOMContentLoaded', function() {
