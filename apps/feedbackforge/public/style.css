@@ -797,3 +797,69 @@ a:hover {
         width: 100%;
     }
 }
+
+/* Streamlined form styles */
+.combined-section {
+    background-color: white;
+    border-left: 4px solid #4a90e2 !important;
+}
+
+.section-part {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+.section-part h4 {
+    color: #3a7ca5;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #f0f0f0;
+    padding-bottom: 8px;
+}
+
+.recommended-field {
+    position: relative;
+    border-left: 3px solid #50b83c;
+    padding-left: 15px !important;
+    animation: highlightField 0.5s ease;
+}
+
+.recommended-field::before {
+    content: "✓ Recommended";
+    position: absolute;
+    right: 10px;
+    top: 0;
+    font-size: 0.7rem;
+    color: #50b83c;
+    font-weight: 500;
+}
+
+@keyframes highlightField {
+    from { background-color: rgba(80, 184, 60, 0.1); }
+    to { background-color: transparent; }
+}
+
+/* Improved form progression */
+.progress-indicator {
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+/* Context-aware sections */
+.context-field,
+.psych-safety-field {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* For mobile screens, ensure proper spacing */
+@media (max-width: 768px) {
+    .section-part {
+        margin-bottom: 30px;
+    }
+    
+    .recommended-field::before {
+        position: static;
+        display: block;
+        margin-bottom: 5px;
+    }
+}
