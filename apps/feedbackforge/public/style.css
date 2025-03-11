@@ -947,3 +947,89 @@ footer p {
     border-left: none !important;
   }
 }
+
+/* Fix for the empty space and tab content display issues */
+
+/* Ensure tab content is visible by default if JavaScript hasn't run yet */
+.tab-content {
+  display: block; /* Override the 'display: none' until JS initializes */
+}
+
+/* Once JS has initialized, it will apply .active appropriately */
+.tabs-initialized .tab-content {
+  display: none;
+}
+
+.tabs-initialized .tab-content.active {
+  display: block;
+}
+
+/* Ensure main container has appropriate height */
+main.container {
+  min-height: 500px;
+  margin-bottom: 2rem;
+}
+
+/* Fix for the tab navigation at the bottom */
+.tabs {
+  margin-top: 2rem;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 1rem;
+}
+
+/* Add this class to the body once JavaScript has initialized */
+body::after {
+  content: "";
+  display: block;
+  height: 0;
+  visibility: hidden;
+}
+
+/* Make sure form sections are visible if JS hasn't run yet */
+.form-section {
+  display: block;
+  margin-bottom: 2rem;
+}
+
+/* Once JS is initialized, manage visibility as needed */
+.js-loaded .form-section {
+  display: none;
+}
+
+.js-loaded .form-section.active-section {
+  display: block;
+}
+
+/* Fix for container width/margins */
+.container {
+  padding: 0 1.5rem;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* Ensure the card appears correctly */
+.card {
+  display: block;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+/* Make sure form is visible */
+#form-container {
+  display: block !important;
+}
+
+/* Ensure tabs have consistent styling */
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 1rem;
+  background: #f5f5f5;
+  border: 1px solid #eee;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #005a9e;
+  color: white;
+}
