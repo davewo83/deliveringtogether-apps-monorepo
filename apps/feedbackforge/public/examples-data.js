@@ -178,11 +178,22 @@ function populateWithExample(exampleType, exampleId) {
             const examples = EXAMPLE_DATA.feedbackTypes[feedbackType];
             exampleData = examples[exampleId % examples.length];
             
-            // For feedback types, we just show the example in a modal
-            showModal(
-                `Example: ${exampleData.title}`,
-                `<div class="example-box">${exampleData.content}</div>`
-            );
+            // Use UIController.showModal instead of direct showModal function
+            // This ensures we use the modal system from FeedbackForge.js
+            if (typeof UIController !== 'undefined' && UIController.showModal) {
+                UIController.showModal(
+                    `Example: ${exampleData.title}`,
+                    `<div class="example-box">${exampleData.content}</div>`
+                );
+            } else {
+                console.error('UIController.showModal not available - fallback to window.showModal');
+                if (typeof window.showModal === 'function') {
+                    window.showModal(
+                        `Example: ${exampleData.title}`,
+                        `<div class="example-box">${exampleData.content}</div>`
+                    );
+                }
+            }
             return;
             
         case 'discStyle':
@@ -192,11 +203,21 @@ function populateWithExample(exampleType, exampleId) {
                 content: EXAMPLE_DATA.discStyles[personalityType][feedbackTypeForDisc]
             };
             
-            // For DISC styles, we just show the example in a modal
-            showModal(
-                `Example: ${getCommunicationStyleName(personalityType)} Communication Style`,
-                `<div class="example-box">${exampleData.content}</div>`
-            );
+            // Use UIController.showModal for consistency
+            if (typeof UIController !== 'undefined' && UIController.showModal) {
+                UIController.showModal(
+                    `Example: ${getCommunicationStyleName(personalityType)} Communication Style`,
+                    `<div class="example-box">${exampleData.content}</div>`
+                );
+            } else {
+                console.error('UIController.showModal not available - fallback to window.showModal');
+                if (typeof window.showModal === 'function') {
+                    window.showModal(
+                        `Example: ${getCommunicationStyleName(personalityType)} Communication Style`,
+                        `<div class="example-box">${exampleData.content}</div>`
+                    );
+                }
+            }
             return;
             
         case 'complete':
@@ -291,10 +312,22 @@ function populateForm(data) {
         }
     }
     
-    // Show first section
-    document.querySelectorAll('.form-section').forEach(section => {
-        section.classList.remove('active-section');
-    });
-    document.getElementById('context-section').classList.add('active-section');
-    updateProgressIndicator('context');
+    // Update UI if FeedbackForgeState is available
+    if (typeof FeedbackForgeState !== 'undefined') {
+        // This triggers proper UI updates
+        if (typeof FeedbackForgeState.update === 'function') {
+            FeedbackForgeState.update('ui', { currentSection: 'context' });
+        }
+    } else {
+        // Fallback if FeedbackForgeState isn't available
+        document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active-section');
+        });
+        document.getElementById('context-section').classList.add('active-section');
+        
+        // Call updateProgressIndicator if it exists
+        if (typeof updateProgressIndicator === 'function') {
+            updateProgressIndicator('context');
+        }
+    }
 }
