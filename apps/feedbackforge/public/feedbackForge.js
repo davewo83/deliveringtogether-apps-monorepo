@@ -1878,6 +1878,13 @@
             this.previewModelElement = document.getElementById('preview-model');
             this.previewStyleElement = document.getElementById('preview-style');
             this.previewToneElement = document.getElementById('preview-tone');
+			
+			console.log('Preview elements found:', {
+				previewElement: !!this.previewElement,
+				previewModelElement: !!this.previewModelElement,
+				previewStyleElement: !!this.previewStyleElement,
+				previewToneElement: !!this.previewToneElement
+			});
             
             // Set up event listeners
             this.setupEventListeners();
@@ -1984,7 +1991,12 @@
          * Update the preview with the current form data
          */
         updatePreview: function() {
-            if (!this.previewElement) return;
+			console.log('Updating preview...');
+			
+            if (!this.previewElement) {
+				console.error('Preview element not found in DOM!');
+				return;
+			}
             
             // Update form data in state
             this.updateStateFromForm();
