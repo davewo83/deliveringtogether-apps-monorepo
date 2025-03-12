@@ -1067,6 +1067,11 @@
      * Handles all UI updates and user interactions
      */
     const UIController = {
+        // DOM elements for scroll indicator
+        formContainer: null,
+        leftPanel: null,
+        scrollIndicator: null,
+        
         /**
          * Initialize UI controller
          */
@@ -1074,6 +1079,147 @@
             this.setupTabs();
             this.setupModalHandling();
             this.setupUserFeedback();
+            
+            // Add scroll indicator initialization
+            this.initScrollIndicator();
+        },
+        
+        /**
+         * Initialize the scroll indicator functionality 
+         */
+        initScrollIndicator: function() {
+            // Cache DOM elements
+            this.formContainer = document.getElementById('form-container');
+            this.leftPanel = document.querySelector('.split-screen-left');
+            
+            if (!this.formContainer || !this.leftPanel) {
+                console.error('Required DOM elements for scroll indicator not found');
+                return;
+            }
+            
+            // Create the scroll indicator
+            this.createScrollIndicator();
+            
+            // Set up scroll events
+            this.setupScrollEvents();
+            
+            // Initial check
+            setTimeout(() => this.checkForOverflow(), 100);
+        },
+        
+        /**
+         * Create and append the scroll indicator element
+         */
+        createScrollIndicator: function() {
+            // Create the indicator element
+            this.scrollIndicator = document.createElement('div');
+            this.scrollIndicator.className = 'scroll-indicator';
+            this.scrollIndicator.innerHTML = `
+                <div class="scroll-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <span>More options below</span>
+            `;
+            
+            // Add click listener to scroll down
+            this.scrollIndicator.addEventListener('click', () => {
+                this.formContainer.scrollBy({
+                    top: 200,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Append to the left panel
+            this.leftPanel.appendChild(this.scrollIndicator);
+        },
+        
+        /**
+         * Set up event listeners for scroll functionality
+         */
+        setupScrollEvents: function() {
+            // Listen for scroll in the form container
+            this.formContainer.addEventListener('scroll', () => this.handleScroll());
+            
+            // Check for overflow on window resize
+            window.addEventListener('resize', () => this.checkForOverflow());
+            
+            // Check when navigation buttons are clicked
+            document.querySelectorAll('.next-button, .prev-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Wait for section transition to complete
+                    setTimeout(() => this.checkForOverflow(), 100);
+                });
+            });
+            
+            // Check when tab content changes
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    setTimeout(() => this.checkForOverflow(), 100);
+                });
+            });
+        },
+        
+        /**
+         * Handle scroll events in the form container
+         */
+        handleScroll: function() {
+            if (!this.formContainer || !this.scrollIndicator) return;
+            
+            // Check if we're near the bottom
+            const scrollTop = this.formContainer.scrollTop;
+            const scrollHeight = this.formContainer.scrollHeight;
+            const clientHeight = this.formContainer.clientHeight;
+            
+            // Hide indicator if near bottom, show if content remains
+            if (scrollTop + clientHeight >= scrollHeight - 50) {
+                this.hideScrollIndicator();
+            } else if (scrollHeight > clientHeight) {
+                this.showScrollIndicator();
+            }
+        },
+        
+        /**
+         * Check if the active form section has content overflow
+         */
+        checkForOverflow: function() {
+            if (!this.formContainer || !this.leftPanel || !this.scrollIndicator) return;
+            
+            // Get the active section
+            const activeSection = document.querySelector('.form-section.active-section');
+            if (!activeSection) return;
+            
+            // Check if content height exceeds container height
+            const containerHeight = this.formContainer.clientHeight;
+            const contentHeight = activeSection.offsetHeight;
+            
+            // Show/hide indicator based on overflow
+            if (contentHeight > containerHeight) {
+                this.showScrollIndicator();
+                this.leftPanel.classList.add('has-overflow');
+            } else {
+                this.hideScrollIndicator();
+                this.leftPanel.classList.remove('has-overflow');
+            }
+        },
+        
+        /**
+         * Show the scroll indicator
+         */
+        showScrollIndicator: function() {
+            if (this.scrollIndicator) {
+                this.scrollIndicator.classList.add('visible');
+            }
+        },
+        
+        /**
+         * Hide the scroll indicator
+         */
+        hideScrollIndicator: function() {
+            if (this.scrollIndicator) {
+                this.scrollIndicator.classList.remove('visible');
+            }
         },
         
         /**
@@ -1116,6 +1262,9 @@
             
             // Update form with current values
             FormHandler.populateFormFromState();
+            
+            // Check for overflow after UI updates
+            setTimeout(() => this.checkForOverflow(), 100);
         },
         
         /**
