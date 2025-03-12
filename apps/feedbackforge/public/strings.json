@@ -1,0 +1,242 @@
+{
+  "ui": {
+    "labels": {
+      "feedbackFor": "Feedback for:",
+      "date": "Date:",
+      "greeting": "Dear",
+      "closing": "Best regards,",
+      "yourName": "[Your Name]"
+    },
+    "buttons": {
+      "copy": "Copy to Clipboard",
+      "copied": "Copied!",
+      "download": "Download as Text",
+      "new": "Create New Feedback",
+      "preview": "Preview Feedback",
+      "generate": "Generate Feedback",
+      "returnToForm": "Return to Form",
+      "updatePreview": "Update Preview",
+      "generateFinal": "Generate Final Version"
+    },
+    "errors": {
+      "required": "This field is required",
+      "modelRequired": "Please fill in at least one field for the {model} model",
+      "examplesNotLoaded": "Examples data not loaded yet",
+      "loadingExamples": "Loading example data... Please try again in a moment.",
+      "exampleNotAvailable": "Example Not Available",
+      "noExamplesAvailable": "No examples available for the {type} feedback type.",
+      "noExamplesForStyle": "No examples available for the {style} communication style with {type} feedback.",
+      "noCompleteExamples": "No complete examples available for the {model} model.",
+      "noExampleType": "No example available for this type."
+    },
+    "tooltips": {
+      "previewNote": "This is a preview. You can edit the text above or adjust the form and preview again."
+    },
+    "placeholders": {
+      "preview": "Your feedback preview will appear here as you fill in the form fields..."
+    },
+    "modals": {
+      "loading": "Loading Examples",
+      "exampleTitle": "Example: {title}",
+      "completeExampleTitle": "Complete Example: {title}",
+      "populateButton": "Use This Example",
+      "completeExampleDescription": "This is a complete example of the {model} feedback model."
+    }
+  },
+  "models": {
+    "simple": {
+      "name": "Simple Feedback",
+      "description": "Strengths, areas for improvement, and support"
+    },
+    "sbi": {
+      "name": "Situation-Behavior-Impact (SBI)",
+      "description": "A structured approach describing context, behavior, and consequences"
+    },
+    "star": {
+      "name": "Situation-Task-Action-Result (STAR)",
+      "description": "Comprehensive framework for analyzing specific examples"
+    }
+  },
+  "feedbackTypes": {
+    "recognition": {
+      "name": "Recognition",
+      "description": "Acknowledge achievements and positive behaviors",
+      "helpText": "Focus on specific achievements and their positive impact"
+    },
+    "improvement": {
+      "name": "Improvement",
+      "description": "Address areas that need development",
+      "helpText": "Address areas for development with a growth mindset"
+    },
+    "coaching": {
+      "name": "Coaching",
+      "description": "Guide development toward specific goals",
+      "helpText": "Guide development toward specific goals with clear examples"
+    },
+    "developmental": {
+      "name": "Developmental",
+      "description": "Focus on long-term career growth",
+      "helpText": "Focus on long-term growth opportunities aligned with career goals"
+    }
+  },
+  "communicationStyles": {
+    "D": {
+      "name": "Direct (High D)",
+      "description": "Focus on results, bottom line"
+    },
+    "I": {
+      "name": "Interactive (High I)",
+      "description": "Enthusiastic, collaborative"
+    },
+    "S": {
+      "name": "Supportive (High S)",
+      "description": "Patient, methodical approach"
+    },
+    "C": {
+      "name": "Analytical (High C)",
+      "description": "Detail-oriented, values accuracy"
+    }
+  },
+  "tones": {
+    "supportive": {
+      "name": "Supportive",
+      "description": "Encouraging and empathetic"
+    },
+    "direct": {
+      "name": "Direct",
+      "description": "Clear and straightforward"
+    },
+    "coaching": {
+      "name": "Coaching",
+      "description": "Guiding and developmental"
+    },
+    "inquiring": {
+      "name": "Inquiring",
+      "description": "Curious and exploratory"
+    }
+  },
+  "psychSafety": {
+    "separate-identity": {
+      "name": "Separate performance from identity",
+      "description": "Focus on behaviors rather than personality traits"
+    },
+    "learning-opportunity": {
+      "name": "Frame as learning opportunity",
+      "description": "Present feedback as a chance to grow and develop"
+    },
+    "collaborative": {
+      "name": "Use collaborative approach",
+      "description": "Position feedback as a shared journey"
+    },
+    "future-focused": {
+      "name": "Focus on future improvement",
+      "description": "Emphasize forward movement rather than past mistakes"
+    }
+  },
+  "deliveryMethod": {
+    "face-to-face": {
+      "name": "Face-to-Face",
+      "description": "In-person conversation"
+    },
+    "written": {
+      "name": "Written",
+      "description": "Email or document format",
+      "statement": "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready."
+    },
+    "remote": {
+      "name": "Remote",
+      "description": "Video call or virtual meeting",
+      "statement": "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person."
+    }
+  },
+  "workplaceSituation": {
+    "normal": {
+      "name": "Normal Operations",
+      "description": "Typical day-to-day working environment"
+    },
+    "crisis": {
+      "name": "Crisis/High Pressure",
+      "description": "During challenging periods or emergencies",
+      "statement": "I recognise we're in a challenging situation right now, but I wanted to take a moment to share some important feedback."
+    },
+    "change": {
+      "name": "Organisational Change",
+      "description": "During restructuring or significant transitions",
+      "statement": "Despite the changes we're experiencing as an organisation, I wanted to provide some feedback that I believe will be valuable for your continued development."
+    }
+  },
+  "feedbackTemplates": {
+    "openingStatements": {
+      "D": {
+        "recognition": "I want to highlight some impressive results you've achieved recently.",
+        "improvement": "I want to share some direct feedback about where I see opportunities for even better results.",
+        "coaching": "Let's discuss how to optimise your approach for maximum impact.",
+        "developmental": "I've identified some specific areas where focused development could significantly improve your effectiveness."
+      },
+      "I": {
+        "recognition": "I'm excited to share some thoughts about the positive impact you've been making!",
+        "improvement": "I'd like to discuss some ideas about how we might collaborate to enhance certain aspects of your work.",
+        "coaching": "I'm looking forward to exploring some development opportunities with you that could be really energising.",
+        "developmental": "I see some exciting growth opportunities that would leverage your natural strengths even further."
+      },
+      "S": {
+        "recognition": "I appreciate your consistent contributions and wanted to acknowledge the positive difference you've been making.",
+        "improvement": "I'd like to share some thoughts on how we might build upon your solid foundation to enhance certain areas.",
+        "coaching": "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress.",
+        "developmental": "Building on your reliable performance, I've identified some development areas that align with your methodical approach."
+      },
+      "C": {
+        "recognition": "Based on my analysis of your recent work, I've identified several noteworthy accomplishments to discuss.",
+        "improvement": "After reviewing your work in detail, I've prepared some specific feedback on areas that could benefit from refinement.",
+        "coaching": "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness.",
+        "developmental": "Looking at the data from your recent performance, I've identified some specific development opportunities with measurable outcomes."
+      },
+      "default": "I appreciate you taking the time to discuss this feedback."
+    },
+    "closingStatements": {
+      "D": "What specific steps will you take next, and when can we review progress?",
+      "I": "I'm excited to see how you'll implement these ideas! Let's schedule a follow-up to discuss your creative approach.",
+      "S": "I'm here to support you through this process. What resources would be most helpful for you?",
+      "C": "Please let me know if you'd like more data or examples to help you analyse this feedback. I'm happy to provide additional detail.",
+      "recognitionD": "What other goals are you now setting your sights on?",
+      "recognitionI": "I'd love to hear your thoughts on this achievement and what you're excited about tackling next!",
+      "recognitionS": "I hope you take a moment to appreciate your consistent contribution here. What would you like to focus on maintaining or developing next?",
+      "recognitionC": "Your methodical approach clearly contributed to these results. I'd be interested in your analysis of the most effective aspects of your process.",
+      "recognitionDefault": "Thank you for your excellent work.",
+      "default": "I welcome your thoughts on this feedback."
+    },
+    "psychSafetyStatements": {
+      "recognition": {
+        "separate-identity": "These accomplishments reflect your dedicated approach and commitment to excellence.",
+        "learning-opportunity": "Success like this creates a foundation for continued growth and development.",
+        "collaborative": "I appreciate how we've been able to work together in this area.",
+        "future-focused": "I'm looking forward to seeing how you'll build on these strengths moving forward."
+      },
+      "other": {
+        "separate-identity": "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person.",
+        "learning-opportunity": "I see this as an opportunity for learning and growth.",
+        "collaborative": "I'd like us to work together on addressing these points.",
+        "future-focused": "Let's focus on how we can move forward from here."
+      }
+    },
+    "followUp": "For follow-up, {plan}"
+  },
+  "modelTemplates": {
+    "simple": {
+      "strengths": "I've noticed your strengths in {strengths}.",
+      "improvement": "I believe we can work together on {improvement}. This presents an opportunity for growth and development.",
+      "support": "To support you with this, {support}."
+    },
+    "sbi": {
+      "situation": "In the recent {situation},",
+      "behavior": "I observed that {behavior}.",
+      "impact": "This had the following impact: {impact}."
+    },
+    "star": {
+      "situation": "In the context of {situation},",
+      "task": "where the objective was to {task},",
+      "action": "I observed that you {action}.",
+      "result": "This resulted in {result}."
+    }
+  }
+}

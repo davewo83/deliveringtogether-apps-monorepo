@@ -76,6 +76,11 @@
 
             // Load examples data
             this.loadExamples();
+            
+            // Subscribe to string service updates
+            StringService.subscribe(() => {
+                this.notify();
+            });
         },
 
         /**
@@ -269,15 +274,15 @@
             if (!FeedbackForgeState.examples) {
                 console.log('Examples data not loaded yet');
                 UIController.showModal(
-                    'Loading Examples',
-                    '<p>Loading example data... Please try again in a moment.</p>'
+                    StringService.getString('ui.modals.loading'),
+                    `<p>${StringService.getString('ui.errors.loadingExamples')}</p>`
                 );
                 return;
             }
 
             let exampleData;
             let modalContent = '';
-            let modalTitle = 'Example';
+            let modalTitle = StringService.getString('ui.modals.exampleTitle', {title: ''});
             
             // Determine which example to use
             switch(exampleType) {
@@ -286,13 +291,13 @@
                     const examples = FeedbackForgeState.examples.feedbackTypes[feedbackType];
                     
                     if (!examples || examples.length === 0) {
-                        modalTitle = 'Example Not Available';
-                        modalContent = `<p>No examples available for the ${feedbackType} feedback type.</p>`;
+                        modalTitle = StringService.getString('ui.errors.exampleNotAvailable');
+                        modalContent = `<p>${StringService.getString('ui.errors.noExamplesAvailable', {type: feedbackType})}</p>`;
                         break;
                     }
                     
                     exampleData = examples[exampleId % examples.length];
-                    modalTitle = `Example: ${exampleData.title}`;
+                    modalTitle = StringService.getString('ui.modals.exampleTitle', {title: exampleData.title});
                     modalContent = `
                         <div class="example-section">
                             <div class="example-box">
@@ -308,13 +313,18 @@
                     
                     if (!FeedbackForgeState.examples.discStyles[personalityType] || 
                         !FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc]) {
-                        modalTitle = 'Example Not Available';
-                        modalContent = `<p>No examples available for the ${personalityType} communication style with ${feedbackTypeForDisc} feedback.</p>`;
+                        modalTitle = StringService.getString('ui.errors.exampleNotAvailable');
+                        modalContent = `<p>${StringService.getString('ui.errors.noExamplesForStyle', {
+                            style: personalityType, 
+                            type: feedbackTypeForDisc
+                        })}</p>`;
                         break;
                     }
                     
                     const styleContent = FeedbackForgeState.examples.discStyles[personalityType][feedbackTypeForDisc];
-                    modalTitle = `Example: ${UIController.getCommunicationStyleName(personalityType)} Communication Style`;
+                    modalTitle = StringService.getString('ui.modals.exampleTitle', {
+                        title: UIController.getCommunicationStyleName(personalityType)
+                    });
                     modalContent = `
                         <div class="example-section">
                             <div class="example-box">
@@ -329,30 +339,34 @@
                     const feedbackModel = document.getElementById('feedback-model').value;
                     
                     if (!FeedbackForgeState.examples.feedbackModels[feedbackModel]) {
-                        modalTitle = 'Example Not Available';
-                        modalContent = `<p>No complete examples available for the ${feedbackModel} model.</p>`;
+                        modalTitle = StringService.getString('ui.errors.exampleNotAvailable');
+                        modalContent = `<p>${StringService.getString('ui.errors.noCompleteExamples', {model: feedbackModel})}</p>`;
                         break;
                     }
                     
                     exampleData = FeedbackForgeState.examples.feedbackModels[feedbackModel];
-                    modalTitle = `Complete Example: ${exampleData.title || UIController.getModelName(feedbackModel)}`;
+                    modalTitle = StringService.getString('ui.modals.completeExampleTitle', {
+                        title: exampleData.title || UIController.getModelName(feedbackModel)
+                    });
                     
                     // For complete examples, we could either show them or offer to populate the form
                     modalContent = `
                         <div class="example-section">
-                            <p>This is a complete example of the ${UIController.getModelName(feedbackModel)} feedback model.</p>
+                            <p>${StringService.getString('ui.modals.completeExampleDescription', {
+                                model: UIController.getModelName(feedbackModel)
+                            })}</p>
                             <div class="example-box">
                                 <p><strong>Context:</strong> ${this.formatCompleteExample(exampleData)}</p>
                             </div>
                             <p>Would you like to use this example to populate the form?</p>
-                            <button id="populate-example" class="primary-button">Use This Example</button>
+                            <button id="populate-example" class="primary-button">${StringService.getString('ui.modals.populateButton')}</button>
                         </div>
                     `;
                     break;
                     
                 default:
-                    modalTitle = 'Example Not Available';
-                    modalContent = '<p>No example available for this type.</p>';
+                    modalTitle = StringService.getString('ui.errors.exampleNotAvailable');
+                    modalContent = `<p>${StringService.getString('ui.errors.noExampleType')}</p>`;
             }
             
             // Show the modal with example content
@@ -777,19 +791,14 @@
          * @param {string} feedbackType - Selected feedback type
          */
         updateContextHelpText: function(feedbackType) {
-            const helpTextMap = {
-                'recognition': 'Focus on specific achievements and their positive impact',
-                'improvement': 'Address areas for development with a growth mindset',
-                'coaching': 'Guide development toward specific goals with clear examples',
-                'developmental': 'Focus on long-term growth opportunities aligned with career goals'
-            };
-            
             const feedbackTypeSelects = document.querySelectorAll('#feedback-type, select[name="feedbackType"]');
             
             feedbackTypeSelects.forEach(select => {
                 const helpText = select.closest('.form-group')?.querySelector('.help-text');
                 if (helpText) {
-                    helpText.textContent = helpTextMap[feedbackType] || 'Choose the primary purpose of your feedback';
+                    helpText.textContent = StringService.getString(`feedbackTypes.${feedbackType}.helpText`, { 
+                        type: feedbackType 
+                    });
                 }
             });
         },
@@ -815,12 +824,12 @@
                     // Add error message
                     const errorMsg = document.createElement('div');
                     errorMsg.className = 'error-message';
-                    errorMsg.textContent = 'This field is required';
+                    errorMsg.textContent = StringService.getString('ui.errors.required');
                     field.parentNode.insertBefore(errorMsg, field.nextSibling);
                     
                     // Update validation errors in state
                     const errors = { ...FeedbackForgeState.ui.validationErrors };
-                    errors[field.name] = 'This field is required';
+                    errors[field.name] = StringService.getString('ui.errors.required');
                     FeedbackForgeState.update('ui', { validationErrors: errors });
                 }
             });
@@ -845,12 +854,16 @@
                         isValid = false;
                         const errorMsg = document.createElement('div');
                         errorMsg.className = 'error-message model-error';
-                        errorMsg.textContent = `Please fill in at least one field for the ${selectedModel.toUpperCase()} model`;
+                        errorMsg.textContent = StringService.getString('ui.errors.modelRequired', { 
+                            model: selectedModel.toUpperCase() 
+                        });
                         modelFields.insertBefore(errorMsg, modelFields.firstChild);
                         
                         // Update validation errors in state
                         const errors = { ...FeedbackForgeState.ui.validationErrors };
-                        errors[selectedModel] = 'Please fill in at least one field';
+                        errors[selectedModel] = StringService.getString('ui.errors.modelRequired', { 
+                            model: selectedModel.toUpperCase() 
+                        });
                         FeedbackForgeState.update('ui', { validationErrors: errors });
                     }
                 }
@@ -885,12 +898,12 @@
                     // Add error message
                     const errorMsg = document.createElement('div');
                     errorMsg.className = 'error-message';
-                    errorMsg.textContent = 'This field is required';
+                    errorMsg.textContent = StringService.getString('ui.errors.required');
                     field.parentNode.insertBefore(errorMsg, field.nextSibling);
                     
                     // Update validation errors in state
                     const errors = { ...FeedbackForgeState.ui.validationErrors };
-                    errors[field.name] = 'This field is required';
+                    errors[field.name] = StringService.getString('ui.errors.required');
                     FeedbackForgeState.update('ui', { validationErrors: errors });
                 }
             });
@@ -914,12 +927,16 @@
                     isValid = false;
                     const errorMsg = document.createElement('div');
                     errorMsg.className = 'error-message model-error';
-                    errorMsg.textContent = `Please fill in at least one field for the ${selectedModel.toUpperCase()} model`;
+                    errorMsg.textContent = StringService.getString('ui.errors.modelRequired', { 
+                        model: selectedModel.toUpperCase() 
+                    });
                     modelFields.insertBefore(errorMsg, modelFields.firstChild);
                     
                     // Update validation errors in state
                     const errors = { ...FeedbackForgeState.ui.validationErrors };
-                    errors[selectedModel] = 'Please fill in at least one field';
+                    errors[selectedModel] = StringService.getString('ui.errors.modelRequired', { 
+                        model: selectedModel.toUpperCase() 
+                    });
                     FeedbackForgeState.update('ui', { validationErrors: errors });
                 }
             }
@@ -1031,15 +1048,15 @@
             let content = '';
             
             if (data.situation) {
-                content += `In the recent ${data.situation}, `;
+                content += StringService.getString('modelTemplates.sbi.situation', { situation: data.situation }) + ' ';
             }
             
             if (data.behavior) {
-                content += `I observed that ${data.behavior}. `;
+                content += StringService.getString('modelTemplates.sbi.behavior', { behavior: data.behavior }) + ' ';
             }
             
             if (data.impact) {
-                content += `This had the following impact: ${data.impact}.`;
+                content += StringService.getString('modelTemplates.sbi.impact', { impact: data.impact });
             }
             
             return content;
@@ -1054,19 +1071,19 @@
             let content = '';
             
             if (data.starSituation) {
-                content += `In the context of ${data.starSituation}, `;
+                content += StringService.getString('modelTemplates.star.situation', { situation: data.starSituation }) + ' ';
             }
             
             if (data.task) {
-                content += `where the objective was to ${data.task}, `;
+                content += StringService.getString('modelTemplates.star.task', { task: data.task }) + ' ';
             }
             
             if (data.action) {
-                content += `I observed that you ${data.action}. `;
+                content += StringService.getString('modelTemplates.star.action', { action: data.action }) + ' ';
             }
             
             if (data.result) {
-                content += `This resulted in ${data.result}.`;
+                content += StringService.getString('modelTemplates.star.result', { result: data.result });
             }
             
             return content;
@@ -1081,17 +1098,21 @@
             let content = '';
             
             if (data.specificStrengths) {
-                content += `I've noticed your strengths in ${data.specificStrengths}. `;
+                content += StringService.getString('modelTemplates.simple.strengths', { 
+                    strengths: data.specificStrengths 
+                }) + ' ';
             }
             
             if (data.areasForImprovement) {
-                // Use growth mindset language
-                content += `I believe we can work together on ${data.areasForImprovement}. `;
-                content += `This presents an opportunity for growth and development. `;
+                content += StringService.getString('modelTemplates.simple.improvement', { 
+                    improvement: data.areasForImprovement 
+                }) + ' ';
             }
             
             if (data.supportOffered) {
-                content += `To support you with this, ${data.supportOffered}.`;
+                content += StringService.getString('modelTemplates.simple.support', { 
+                    support: data.supportOffered 
+                });
             }
             
             return content;
@@ -1120,10 +1141,10 @@
             const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
             
             // Start the script
-            let script = `Feedback for: ${recipientName || 'Team Member'}\nDate: ${formattedDate}\n\n`;
+            let script = `${StringService.getString('ui.labels.feedbackFor')} ${recipientName || 'Team Member'}\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
             
             // Add greeting
-            script += `Dear ${recipientName || 'Team Member'},\n\n`;
+            script += `${StringService.getString('ui.labels.greeting')} ${recipientName || 'Team Member'},\n\n`;
             
             // Add opening statement based on personality type and situation
             script += this.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
@@ -1134,43 +1155,7 @@
             script += '\n\n';
             
             // Add psychological safety elements - adapted based on feedback type
-            let psychSafetyContent = '';
-            
-            // Different approach for recognition vs other feedback types
-            if (feedbackType === 'recognition') {
-                if (psychSafetyElements.includes('separate-identity')) {
-                    psychSafetyContent += "These accomplishments reflect your dedicated approach and commitment to excellence. ";
-                }
-                
-                if (psychSafetyElements.includes('learning-opportunity')) {
-                    psychSafetyContent += "Success like this creates a foundation for continued growth and development. ";
-                }
-                
-                if (psychSafetyElements.includes('collaborative')) {
-                    psychSafetyContent += "I appreciate how we've been able to work together in this area. ";
-                }
-                
-                if (psychSafetyElements.includes('future-focused')) {
-                    psychSafetyContent += "I'm looking forward to seeing how you'll build on these strengths moving forward. ";
-                }
-            } else {
-                // For improvement, coaching, development feedback
-                if (psychSafetyElements.includes('separate-identity')) {
-                    psychSafetyContent += "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person. ";
-                }
-                
-                if (psychSafetyElements.includes('learning-opportunity')) {
-                    psychSafetyContent += "I see this as an opportunity for learning and growth. ";
-                }
-                
-                if (psychSafetyElements.includes('collaborative')) {
-                    psychSafetyContent += "I'd like us to work together on addressing these points. ";
-                }
-                
-                if (psychSafetyElements.includes('future-focused')) {
-                    psychSafetyContent += "Let's focus on how we can move forward from here. ";
-                }
-            }
+            let psychSafetyContent = this.getPsychSafetyContent(feedbackType, psychSafetyElements);
             
             if (psychSafetyContent) {
                 script += psychSafetyContent + '\n\n';
@@ -1178,27 +1163,49 @@
             
             // Add follow-up plan if provided
             if (followUp) {
-                script += `For follow-up, ${followUp}\n\n`;
+                script += StringService.getString('feedbackTemplates.followUp', { plan: followUp }) + '\n\n';
             }
             
             // Add delivery method specific text
-            if (deliveryMethod === 'written') {
-                script += "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready. ";
-            } else if (deliveryMethod === 'remote') {
-                script += "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person. ";
-            }
-            
             if (deliveryMethod !== 'face-to-face') {
-                script += '\n\n';
+                const statement = StringService.getString(`deliveryMethod.${deliveryMethod}.statement`, null);
+                if (statement) {
+                    script += statement + '\n\n';
+                }
             }
             
             // Add closing statement based on personality type
             script += this.getClosingStatement(personalityType, feedbackType);
             
             // Add formal closing
-            script += '\n\nBest regards,\n[Your Name]';
+            script += `\n\n${StringService.getString('ui.labels.closing')}\n${StringService.getString('ui.labels.yourName')}`;
             
             return script;
+        },
+        
+        /**
+         * Get psychological safety content
+         * @param {string} feedbackType - Type of feedback
+         * @param {Array} psychSafetyElements - Selected psychological safety elements
+         * @returns {string} - Psychological safety content
+         */
+        getPsychSafetyContent: function(feedbackType, psychSafetyElements) {
+            const category = feedbackType === 'recognition' ? 'recognition' : 'other';
+            let psychSafetyContent = '';
+            
+            // Add content for each selected element
+            psychSafetyElements.forEach(element => {
+                const statement = StringService.getString(
+                    `feedbackTemplates.psychSafetyStatements.${category}.${element}`, 
+                    null
+                );
+                
+                if (statement) {
+                    psychSafetyContent += statement + ' ';
+                }
+            });
+            
+            return psychSafetyContent;
         },
         
         /**
@@ -1211,47 +1218,24 @@
          */
         getOpeningStatement: function(personalityType, situation, feedbackType, tone) {
             // Crisis situation overrides take priority
-            if (situation === 'crisis') {
-                return "I recognise we're in a challenging situation right now, but I wanted to take a moment to share some important feedback.";
-            }
-            
-            // Organisational change situation
-            if (situation === 'change') {
-                return "Despite the changes we're experiencing as an organisation, I wanted to provide some feedback that I believe will be valuable for your continued development.";
-            }
-            
-            // Personality-based openings
-            const openings = {
-                'D': {
-                    'recognition': "I want to highlight some impressive results you've achieved recently.",
-                    'improvement': "I want to share some direct feedback about where I see opportunities for even better results.",
-                    'coaching': "Let's discuss how to optimise your approach for maximum impact.",
-                    'developmental': "I've identified some specific areas where focused development could significantly improve your effectiveness."
-                },
-                'I': {
-                    'recognition': "I'm excited to share some thoughts about the positive impact you've been making!",
-                    'improvement': "I'd like to discuss some ideas about how we might collaborate to enhance certain aspects of your work.",
-                    'coaching': "I'm looking forward to exploring some development opportunities with you that could be really energising.",
-                    'developmental': "I see some exciting growth opportunities that would leverage your natural strengths even further."
-                },
-                'S': {
-                    'recognition': "I appreciate your consistent contributions and wanted to acknowledge the positive difference you've been making.",
-                    'improvement': "I'd like to share some thoughts on how we might build upon your solid foundation to enhance certain areas.",
-                    'coaching': "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress.",
-                    'developmental': "Building on your reliable performance, I've identified some development areas that align with your methodical approach."
-                },
-                'C': {
-                    'recognition': "Based on my analysis of your recent work, I've identified several noteworthy accomplishments to discuss.",
-                    'improvement': "After reviewing your work in detail, I've prepared some specific feedback on areas that could benefit from refinement.",
-                    'coaching': "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness.",
-                    'developmental': "Looking at the data from your recent performance, I've identified some specific development opportunities with measurable outcomes."
+            if (situation === 'crisis' || situation === 'change') {
+                const statement = StringService.getString(`workplaceSituation.${situation}.statement`, null);
+                if (statement) {
+                    return statement;
                 }
-            };
+            }
             
             // Get appropriate opening based on personality and feedback type
-            let opening = "I appreciate you taking the time to discuss this feedback.";
-            if (openings[personalityType] && openings[personalityType][feedbackType]) {
-                opening = openings[personalityType][feedbackType];
+            let opening = StringService.getString('feedbackTemplates.openingStatements.default');
+            
+            // Try to get the specific statement for this personality and feedback type
+            const specificStatement = StringService.getString(
+                `feedbackTemplates.openingStatements.${personalityType}.${feedbackType}`, 
+                null
+            );
+            
+            if (specificStatement) {
+                opening = specificStatement;
             }
             
             // Tone adjustments
@@ -1276,26 +1260,34 @@
          * @returns {string} - Closing statement
          */
         getClosingStatement: function(personalityType, feedbackType) {
-            const closings = {
-                'D': "What specific steps will you take next, and when can we review progress?",
-                'I': "I'm excited to see how you'll implement these ideas! Let's schedule a follow-up to discuss your creative approach.",
-                'S': "I'm here to support you through this process. What resources would be most helpful for you?",
-                'C': "Please let me know if you'd like more data or examples to help you analyse this feedback. I'm happy to provide additional detail."
-            };
-            
             // Specialized closings for recognition feedback
             if (feedbackType === 'recognition') {
-                const recognitionClosings = {
-                    'D': "What other goals are you now setting your sights on?",
-                    'I': "I'd love to hear your thoughts on this achievement and what you're excited about tackling next!",
-                    'S': "I hope you take a moment to appreciate your consistent contribution here. What would you like to focus on maintaining or developing next?",
-                    'C': "Your methodical approach clearly contributed to these results. I'd be interested in your analysis of the most effective aspects of your process."
-                };
+                // Try to get recognition-specific closing
+                const specificClosing = StringService.getString(
+                    `feedbackTemplates.closingStatements.recognition${personalityType}`, 
+                    null
+                );
                 
-                return recognitionClosings[personalityType] || "Thank you for your excellent work.";
+                if (specificClosing) {
+                    return specificClosing;
+                }
+                
+                // Fall back to the default recognition closing
+                return StringService.getString('feedbackTemplates.closingStatements.recognitionDefault');
             }
             
-            return closings[personalityType] || "I welcome your thoughts on this feedback.";
+            // Try to get personality-specific closing
+            const typedClosing = StringService.getString(
+                `feedbackTemplates.closingStatements.${personalityType}`, 
+                null
+            );
+            
+            if (typedClosing) {
+                return typedClosing;
+            }
+            
+            // Fall back to default closing
+            return StringService.getString('feedbackTemplates.closingStatements.default');
         }
     };
 
@@ -1582,22 +1574,22 @@
                     <div class="edit-feedback">
                         <h3>Edit Feedback</h3>
                         <textarea id="edit-feedback-text">${state.result.feedbackScript}</textarea>
-                        <button class="primary-button" id="update-preview">Update Preview</button>
+                        <button class="primary-button" id="update-preview">${StringService.getString('ui.buttons.updatePreview')}</button>
                     </div>
                     <div class="preview-note">
-                        <p>This is a preview. You can edit the text above or adjust the form and preview again.</p>
+                        <p>${StringService.getString('ui.tooltips.previewNote')}</p>
                     </div>
                     <div class="form-controls">
-                        <button class="secondary-button" id="return-to-form">Return to Form</button>
-                        <button class="primary-button" id="generate-from-preview">Generate Final Version</button>
+                        <button class="secondary-button" id="return-to-form">${StringService.getString('ui.buttons.returnToForm')}</button>
+                        <button class="primary-button" id="generate-from-preview">${StringService.getString('ui.buttons.generateFinal')}</button>
                     </div>
                 `;
             } else {
                 html += `
                     <div class="form-controls">
-                        <button class="primary-button" id="copy-feedback">Copy to Clipboard</button>
-                        <button class="secondary-button" id="download-feedback">Download as Text</button>
-                        <button class="tertiary-button" id="new-feedback">Create New Feedback</button>
+                        <button class="primary-button" id="copy-feedback">${StringService.getString('ui.buttons.copy')}</button>
+                        <button class="secondary-button" id="download-feedback">${StringService.getString('ui.buttons.download')}</button>
+                        <button class="tertiary-button" id="new-feedback">${StringService.getString('ui.buttons.new')}</button>
                     </div>
                 `;
             }
@@ -1639,9 +1631,9 @@
                 document.getElementById('copy-feedback')?.addEventListener('click', function() {
                     navigator.clipboard.writeText(FeedbackForgeState.result.feedbackScript).then(
                         function() {
-                            this.textContent = 'Copied!';
+                            this.textContent = StringService.getString('ui.buttons.copied');
                             setTimeout(() => {
-                                this.textContent = 'Copy to Clipboard';
+                                this.textContent = StringService.getString('ui.buttons.copy');
                             }, 2000);
                         }.bind(this), 
                         function() {
@@ -1753,13 +1745,7 @@
          * @returns {string} - Human-readable name
          */
         getFeedbackTypeName: function(type) {
-            const types = {
-                'recognition': 'Recognition',
-                'improvement': 'Improvement',
-                'coaching': 'Coaching',
-                'developmental': 'Developmental'
-            };
-            return types[type] || type;
+            return StringService.getString(`feedbackTypes.${type}.name`, { type });
         },
         
         /**
@@ -1768,12 +1754,7 @@
          * @returns {string} - Human-readable model name
          */
         getModelName: function(model) {
-            const models = {
-                'simple': 'Simple Feedback',
-                'sbi': 'Situation-Behavior-Impact (SBI)',
-                'star': 'Situation-Task-Action-Result (STAR)'
-            };
-            return models[model] || model;
+            return StringService.getString(`models.${model}.name`, { model });
         },
         
         /**
@@ -1782,12 +1763,7 @@
          * @returns {string} - Human-readable method name
          */
         getDeliveryMethodName: function(method) {
-            const methods = {
-                'face-to-face': 'Face-to-Face',
-                'written': 'Written',
-                'remote': 'Remote Video Call'
-            };
-            return methods[method] || method;
+            return StringService.getString(`deliveryMethod.${method}.name`, { method });
         },
         
         /**
@@ -1796,12 +1772,7 @@
          * @returns {string} - Human-readable situation name
          */
         getSituationName: function(situation) {
-            const situations = {
-                'normal': 'Normal Operations',
-                'crisis': 'Crisis/High Pressure',
-                'change': 'Organisational Change'
-            };
-            return situations[situation] || situation;
+            return StringService.getString(`workplaceSituation.${situation}.name`, { situation });
         },
         
         /**
@@ -1810,13 +1781,7 @@
          * @returns {string} - Human-readable style name
          */
         getCommunicationStyleName: function(style) {
-            const styles = {
-                'D': 'Direct (High D)',
-                'I': 'Interactive (High I)',
-                'S': 'Supportive (High S)',
-                'C': 'Analytical (High C)'
-            };
-            return styles[style] || style;
+            return StringService.getString(`communicationStyles.${style}.name`, { style });
         },
         
         /**
@@ -1825,13 +1790,7 @@
          * @returns {string} - Human-readable tone name
          */
         getToneName: function(tone) {
-            const tones = {
-                'supportive': 'Supportive',
-                'direct': 'Direct',
-                'coaching': 'Coaching',
-                'inquiring': 'Inquiring'
-            };
-            return tones[tone] || tone;
+            return StringService.getString(`tones.${tone}.name`, { tone });
         },
         
         /**
@@ -1844,14 +1803,9 @@
                 return 'None selected';
             }
             
-            const names = {
-                'separate-identity': 'Separate performance from identity',
-                'learning-opportunity': 'Frame as learning opportunity',
-                'collaborative': 'Use collaborative approach',
-                'future-focused': 'Focus on future improvement'
-            };
-            
-            return elements.map(el => names[el] || el).join(', ');
+            return elements.map(el => 
+                StringService.getString(`psychSafety.${el}.name`, { element: el })
+            ).join(', ');
         }
     };
 
@@ -1957,7 +1911,7 @@
                     .then(() => {
                         const button = document.getElementById('copy-feedback');
                         const originalText = button.textContent;
-                        button.textContent = 'Copied!';
+                        button.textContent = StringService.getString('ui.buttons.copied');
                         setTimeout(() => {
                             button.textContent = originalText;
                         }, 2000);
@@ -2091,7 +2045,7 @@
             
             // If we don't have enough content, show a placeholder message
             if (!this.hasMinimalContent(feedbackContent)) {
-                return 'Your feedback preview will appear here as you fill in the form fields...';
+                return StringService.getString('ui.placeholders.preview');
             }
             
             // Create complete feedback script with OpenAI/closing
@@ -2116,15 +2070,15 @@
             let content = '';
             
             if (data.situation) {
-                content += `In the recent ${data.situation}, `;
+                content += StringService.getString('modelTemplates.sbi.situation', { situation: data.situation }) + ' ';
             }
             
             if (data.behavior) {
-                content += `I observed that ${data.behavior}. `;
+                content += StringService.getString('modelTemplates.sbi.behavior', { behavior: data.behavior }) + ' ';
             }
             
             if (data.impact) {
-                content += `This had the following impact: ${data.impact}.`;
+                content += StringService.getString('modelTemplates.sbi.impact', { impact: data.impact });
             }
             
             return content;
@@ -2134,19 +2088,19 @@
             let content = '';
             
             if (data.starSituation) {
-                content += `In the context of ${data.starSituation}, `;
+                content += StringService.getString('modelTemplates.star.situation', { situation: data.starSituation }) + ' ';
             }
             
             if (data.task) {
-                content += `where the objective was to ${data.task}, `;
+                content += StringService.getString('modelTemplates.star.task', { task: data.task }) + ' ';
             }
             
             if (data.action) {
-                content += `I observed that you ${data.action}. `;
+                content += StringService.getString('modelTemplates.star.action', { action: data.action }) + ' ';
             }
             
             if (data.result) {
-                content += `This resulted in ${data.result}.`;
+                content += StringService.getString('modelTemplates.star.result', { result: data.result });
             }
             
             return content;
@@ -2156,16 +2110,21 @@
             let content = '';
             
             if (data.specificStrengths) {
-                content += `I've noticed your strengths in ${data.specificStrengths}. `;
+                content += StringService.getString('modelTemplates.simple.strengths', { 
+                    strengths: data.specificStrengths 
+                }) + ' ';
             }
             
             if (data.areasForImprovement) {
-                content += `I believe we can work together on ${data.areasForImprovement}. `;
-                content += `This presents an opportunity for growth and development. `;
+                content += StringService.getString('modelTemplates.simple.improvement', { 
+                    improvement: data.areasForImprovement 
+                }) + ' ';
             }
             
             if (data.supportOffered) {
-                content += `To support you with this, ${data.supportOffered}.`;
+                content += StringService.getString('modelTemplates.simple.support', { 
+                    support: data.supportOffered 
+                });
             }
             
             return content;
@@ -2187,13 +2146,13 @@
             const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
             
             // Start the script
-            let script = `Feedback for: ${recipientName || 'Team Member'}\nDate: ${formattedDate}\n\n`;
+            let script = `${StringService.getString('ui.labels.feedbackFor')} ${recipientName || 'Team Member'}\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
             
             // Add greeting
-            script += `Dear ${recipientName || 'Team Member'},\n\n`;
+            script += `${StringService.getString('ui.labels.greeting')} ${recipientName || 'Team Member'},\n\n`;
             
-            // Add opening statement based on personality type and situation
-            script += this.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
+            // Add opening statement
+            script += FeedbackGenerator.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
             script += '\n\n';
             
             // Add main feedback content
@@ -2202,42 +2161,19 @@
             
             // Add psychological safety elements - adapted based on feedback type
             let psychSafetyContent = '';
+            const category = feedbackType === 'recognition' ? 'recognition' : 'other';
             
-            // Different approach for recognition vs other feedback types
-            if (feedbackType === 'recognition') {
-                if (psychSafetyElements.includes('separate-identity')) {
-                    psychSafetyContent += "These accomplishments reflect your dedicated approach and commitment to excellence. ";
-                }
+            // Add content for each selected element
+            psychSafetyElements.forEach(element => {
+                const statement = StringService.getString(
+                    `feedbackTemplates.psychSafetyStatements.${category}.${element}`, 
+                    null
+                );
                 
-                if (psychSafetyElements.includes('learning-opportunity')) {
-                    psychSafetyContent += "Success like this creates a foundation for continued growth and development. ";
+                if (statement) {
+                    psychSafetyContent += statement + ' ';
                 }
-                
-                if (psychSafetyElements.includes('collaborative')) {
-                    psychSafetyContent += "I appreciate how we've been able to work together in this area. ";
-                }
-                
-                if (psychSafetyElements.includes('future-focused')) {
-                    psychSafetyContent += "I'm looking forward to seeing how you'll build on these strengths moving forward. ";
-                }
-            } else {
-                // For improvement, coaching, development feedback
-                if (psychSafetyElements.includes('separate-identity')) {
-                    psychSafetyContent += "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person. ";
-                }
-                
-                if (psychSafetyElements.includes('learning-opportunity')) {
-                    psychSafetyContent += "I see this as an opportunity for learning and growth. ";
-                }
-                
-                if (psychSafetyElements.includes('collaborative')) {
-                    psychSafetyContent += "I'd like us to work together on addressing these points. ";
-                }
-                
-                if (psychSafetyElements.includes('future-focused')) {
-                    psychSafetyContent += "Let's focus on how we can move forward from here. ";
-                }
-            }
+            });
             
             if (psychSafetyContent) {
                 script += psychSafetyContent + '\n\n';
@@ -2245,110 +2181,24 @@
             
             // Add follow-up plan if provided
             if (followUp) {
-                script += `For follow-up, ${followUp}\n\n`;
+                script += StringService.getString('feedbackTemplates.followUp', { plan: followUp }) + '\n\n';
             }
             
             // Add delivery method specific text
-            if (deliveryMethod === 'written') {
-                script += "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready. ";
-            } else if (deliveryMethod === 'remote') {
-                script += "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person. ";
-            }
-            
             if (deliveryMethod !== 'face-to-face') {
-                script += '\n\n';
+                const statement = StringService.getString(`deliveryMethod.${deliveryMethod}.statement`, null);
+                if (statement) {
+                    script += statement + '\n\n';
+                }
             }
             
             // Add closing statement based on personality type
-            script += this.getClosingStatement(personalityType, feedbackType);
+            script += FeedbackGenerator.getClosingStatement(personalityType, feedbackType);
             
             // Add formal closing
-            script += '\n\nBest regards,\n[Your Name]';
+            script += `\n\n${StringService.getString('ui.labels.closing')}\n${StringService.getString('ui.labels.yourName')}`;
             
             return script;
-        },
-        
-        getOpeningStatement: function(personalityType, situation, feedbackType, tone) {
-            // Crisis situation overrides take priority
-            if (situation === 'crisis') {
-                return "I recognise we're in a challenging situation right now, but I wanted to take a moment to share some important feedback.";
-            }
-            
-            // Organisational change situation
-            if (situation === 'change') {
-                return "Despite the changes we're experiencing as an organisation, I wanted to provide some feedback that I believe will be valuable for your continued development.";
-            }
-            
-            // Personality-based openings
-            const openings = {
-                'D': {
-                    'recognition': "I want to highlight some impressive results you've achieved recently.",
-                    'improvement': "I want to share some direct feedback about where I see opportunities for even better results.",
-                    'coaching': "Let's discuss how to optimise your approach for maximum impact.",
-                    'developmental': "I've identified some specific areas where focused development could significantly improve your effectiveness."
-                },
-                'I': {
-                    'recognition': "I'm excited to share some thoughts about the positive impact you've been making!",
-                    'improvement': "I'd like to discuss some ideas about how we might collaborate to enhance certain aspects of your work.",
-                    'coaching': "I'm looking forward to exploring some development opportunities with you that could be really energising.",
-                    'developmental': "I see some exciting growth opportunities that would leverage your natural strengths even further."
-                },
-                'S': {
-                    'recognition': "I appreciate your consistent contributions and wanted to acknowledge the positive difference you've been making.",
-                    'improvement': "I'd like to share some thoughts on how we might build upon your solid foundation to enhance certain areas.",
-                    'coaching': "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress.",
-                    'developmental': "Building on your reliable performance, I've identified some development areas that align with your methodical approach."
-                },
-                'C': {
-                    'recognition': "Based on my analysis of your recent work, I've identified several noteworthy accomplishments to discuss.",
-                    'improvement': "After reviewing your work in detail, I've prepared some specific feedback on areas that could benefit from refinement.",
-                    'coaching': "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness.",
-                    'developmental': "Looking at the data from your recent performance, I've identified some specific development opportunities with measurable outcomes."
-                }
-            };
-            
-            // Get appropriate opening based on personality and feedback type
-            let opening = "I appreciate you taking the time to discuss this feedback.";
-            if (openings[personalityType] && openings[personalityType][feedbackType]) {
-                opening = openings[personalityType][feedbackType];
-            }
-            
-            // Tone adjustments
-            if (tone === 'direct') {
-                opening = opening
-                    .replace('I\'d like to', 'I want to')
-                    .replace('might', 'should')
-                    .replace('could', 'will');
-            }
-            
-            if (tone === 'inquiring') {
-                opening += " Would you be open to discussing this?";
-            }
-            
-            return opening;
-        },
-        
-        getClosingStatement: function(personalityType, feedbackType) {
-            const closings = {
-                'D': "What specific steps will you take next, and when can we review progress?",
-                'I': "I'm excited to see how you'll implement these ideas! Let's schedule a follow-up to discuss your creative approach.",
-                'S': "I'm here to support you through this process. What resources would be most helpful for you?",
-                'C': "Please let me know if you'd like more data or examples to help you analyse this feedback. I'm happy to provide additional detail."
-            };
-            
-            // Specialized closings for recognition feedback
-            if (feedbackType === 'recognition') {
-                const recognitionClosings = {
-                    'D': "What other goals are you now setting your sights on?",
-                    'I': "I'd love to hear your thoughts on this achievement and what you're excited about tackling next!",
-                    'S': "I hope you take a moment to appreciate your consistent contribution here. What would you like to focus on maintaining or developing next?",
-                    'C': "Your methodical approach clearly contributed to these results. I'd be interested in your analysis of the most effective aspects of your process."
-                };
-                
-                return recognitionClosings[personalityType] || "Thank you for your excellent work.";
-            }
-            
-            return closings[personalityType] || "I welcome your thoughts on this feedback.";
         }
     };
 
