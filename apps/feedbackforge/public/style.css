@@ -575,6 +575,8 @@ legend {
   flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 0.5rem;
+  position: relative; /* Added for shrinking cards positioning */
+  transition: all 0.3s ease; /* For smooth transitions */
 }
 
 .option-cards input[type="radio"] {
@@ -827,4 +829,226 @@ legend {
 .action-buttons {
     display: flex;
     gap: 1rem;
+}
+
+/* ===== SHRINKING CARDS STYLES ===== */
+
+/* Selection summary shown in compact mode */
+.selection-summary {
+  display: none;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 0.8rem 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.selection-summary strong {
+  color: #333;
+  margin-right: 0.5rem;
+}
+
+/* Expand button styling */
+.card-expand-button {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 0.4rem;
+  background-color: #f0f7ff;
+  color: #005a9e;
+  border: 1px solid #cce5ff;
+  border-radius: 4px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+}
+
+.card-expand-button:hover {
+  background-color: #e6f2ff;
+}
+
+.card-expand-button svg {
+  transition: transform 0.2s ease;
+}
+
+/* Compact mode styling */
+.shrinking-cards.compact-mode {
+  padding-top: 2.5rem; /* Space for expand button */
+}
+
+.shrinking-cards.compact-mode .option-card {
+  display: none; /* Hide all cards in compact mode */
+}
+
+.shrinking-cards.compact-mode .option-card.active-card {
+  display: flex; /* Show only the selected card */
+  background-color: #f0f7ff;
+  border-color: #005a9e;
+  animation: cardActivate 0.3s ease;
+}
+
+.shrinking-cards.compact-mode .card-expand-button {
+  display: flex; /* Show expand button in compact mode */
+}
+
+.shrinking-cards.compact-mode .selection-summary {
+  display: block; /* Show selection summary in compact mode */
+}
+
+/* Compact card styles */
+.shrinking-cards.compact-mode .option-card.active-card {
+  padding: 0.75rem;
+  min-height: unset;
+}
+
+.shrinking-cards.compact-mode .option-card.active-card .option-description {
+  display: none; /* Hide description in compact mode */
+}
+
+/* Animation for card activation */
+@keyframes cardActivate {
+  0% { transform: scale(0.95); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ===== ACCORDION LAYOUT STYLES ===== */
+
+/* Accordion header styling */
+.accordion-header {
+  display: none; /* Hidden by default on desktop */
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.accordion-header.active {
+  background-color: #e6f2ff;
+  border-color: #005a9e;
+  box-shadow: 0 2px 4px rgba(0, 90, 158, 0.1);
+}
+
+.accordion-header .accordion-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #333;
+}
+
+.accordion-header.active .accordion-title {
+  color: #005a9e;
+}
+
+.accordion-header .section-summary {
+  font-size: 0.85rem;
+  font-weight: normal;
+  color: #666;
+  margin-left: 1rem;
+}
+
+.accordion-header .accordion-icon {
+  transition: transform 0.3s ease;
+}
+
+.accordion-header.active .accordion-icon {
+  transform: rotate(180deg);
+}
+
+/* Active section indicator */
+.accordion-header::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  height: 0;
+  width: 4px;
+  background-color: #005a9e;
+  border-radius: 0 2px 2px 0;
+  transition: height 0.3s ease;
+}
+
+.accordion-header.active::before {
+  height: calc(100% - 0.5rem);
+}
+
+/* ===== MOBILE VIEW STYLES ===== */
+
+/* Apply accordion layout on mobile */
+@media (max-width: 768px) {
+  /* Show accordion headers in mobile view */
+  .mobile-accordion-view .accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+  }
+  
+  /* Hide all form sections by default */
+  .mobile-accordion-view .form-section {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  /* Show only active section */
+  .mobile-accordion-view .form-section.active-section {
+    display: block;
+  }
+  
+  /* Space between accordion header and content */
+  .mobile-accordion-view .form-section.active-section {
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #e9ecef;
+  }
+  
+  /* Always show option cards in compact mode on mobile */
+  .mobile-accordion-view .shrinking-cards.compact-mode {
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Progress indicator adjustments for mobile */
+  .mobile-accordion-view .progress-indicator {
+    display: none; /* Hide progress steps - we use accordion instead */
+  }
+  
+  /* Navigation button adjustments */
+  .mobile-accordion-view .form-navigation {
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  /* More compact form groups on mobile */
+  .mobile-accordion-view .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  /* More narrow option cards on mobile */
+  .mobile-accordion-view .option-card {
+    padding: 0.75rem;
+  }
+  
+  /* Ensure active section is visible */
+  .mobile-accordion-view .form-section.active-section {
+    animation: fadeIn 0.3s ease;
+  }
+  
+  /* Preview area adjustments */
+  .mobile-accordion-view .split-screen-right {
+    margin-top: 2rem;
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

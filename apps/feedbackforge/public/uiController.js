@@ -14,6 +14,9 @@ const UIController = (function() {
     let leftPanel = null;
     let scrollIndicator = null;
     
+    // Mobile breakpoint
+    const MOBILE_BREAKPOINT = 768;
+    
     /**
      * Initialize UI controller
      */
@@ -27,6 +30,18 @@ const UIController = (function() {
         
         // Initialize option cards
         setupOptionCards();
+        
+        // Initialize shrinking cards functionality
+        initShrinkingCards();
+        
+        // Initialize accordion layout for mobile
+        initAccordionLayout();
+        
+        // Check for mobile view
+        checkForMobileView();
+        
+        // Listen for window resize events
+        window.addEventListener('resize', debounce(checkForMobileView, 250));
     }
     
     /**
@@ -205,6 +220,11 @@ const UIController = (function() {
             activeContent.classList.add('active');
         }
         
+        // Update accordion state if in mobile view
+        if (isMobileView()) {
+            updateAccordionState(state.ui.currentSection);
+        }
+        
         // Check for overflow after UI updates
         setTimeout(() => checkForOverflow(), 100);
     }
@@ -235,19 +255,49 @@ const UIController = (function() {
                 // Validate current section
                 if (!FormHandler.validateSection(currentSection)) return;
                 
+                // If we're in mobile view, toggle sections instead of using default behavior
+                if (isMobileView()) {
+                    // Update active section
+                    FeedbackForgeState.update('ui', { currentSection: nextSectionId });
+                    
+                    // Update accordion state
+                    updateAccordionState(nextSectionId);
+                    
+                    // If we're on the review section, generate the summary
+                    if (nextSectionId === 'review') {
+                        generateFormSummary();
+                    }
+                    
+                    e.preventDefault();
+                    return;
+                }
+                
                 // Update UI state
                 FeedbackForgeState.update('ui', { currentSection: nextSectionId });
                 
                 // If we're on the review section, generate the summary
                 if (nextSectionId === 'review') {
-                    UIController.generateFormSummary();
+                    generateFormSummary();
                 }
             });
         });
         
         document.querySelectorAll('.prev-button').forEach(button => {
-            button.addEventListener('click', () => {
+            button.addEventListener('click', (e) => {
                 const prevSectionId = button.dataset.prev;
+                
+                // If we're in mobile view, toggle sections instead of using default behavior
+                if (isMobileView()) {
+                    // Update active section
+                    FeedbackForgeState.update('ui', { currentSection: prevSectionId });
+                    
+                    // Update accordion state
+                    updateAccordionState(prevSectionId);
+                    
+                    e.preventDefault();
+                    return;
+                }
+                
                 FeedbackForgeState.update('ui', { currentSection: prevSectionId });
             });
         });
@@ -627,9 +677,381 @@ const UIController = (function() {
                     
                     // Update the live preview
                     LivePreviewManager.updatePreview();
+                    
+                    // For shrinking cards functionality
+                    const card = this.nextElementSibling;
+                    if (card && card.classList.contains('option-card')) {
+                        applyCardSelection(card);
+                    }
                 });
             });
         });
+    }
+    
+    // ===== SHRINKING CARDS FUNCTIONALITY =====
+    
+    /**
+     * Initialize the shrinking cards functionality
+     */
+    function initShrinkingCards() {
+        // Add shrinking-cards class to all option cards groups
+        document.querySelectorAll('.option-cards').forEach(group => {
+            group.classList.add('shrinking-cards');
+            
+            // Add expand button
+            addExpandButton(group);
+            
+            // Check if there's a selected card
+            const selectedRadio = group.querySelector('input[type="radio"]:checked');
+            if (selectedRadio) {
+                const card = selectedRadio.nextElementSibling;
+                if (card) {
+                    applyCardSelection(card);
+                }
+            }
+        });
+    }
+    
+    /**
+     * Add expand button to a card group
+     * @param {HTMLElement} cardGroup - Card group to add button to
+     */
+    function addExpandButton(cardGroup) {
+        // Check if button already exists
+        if (cardGroup.querySelector('.card-expand-button')) return;
+        
+        // Create button
+        const expandButton = document.createElement('button');
+        expandButton.className = 'card-expand-button';
+        expandButton.type = 'button';
+        expandButton.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 15l8-8 8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Change</span>
+        `;
+        
+        // Add click handler
+        expandButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleCardGroupExpansion(cardGroup);
+        });
+        
+        // Add to card group
+        cardGroup.appendChild(expandButton);
+    }
+    
+    /**
+     * Apply selection styling to a card and update group
+     * @param {HTMLElement} card - The selected card
+     */
+    function applyCardSelection(card) {
+        const cardGroup = card.closest('.option-cards');
+        if (!cardGroup) return;
+        
+        // Remove active class from all cards
+        cardGroup.querySelectorAll('.option-card').forEach(c => {
+            c.classList.remove('active-card');
+        });
+        
+        // Add active class to selected card
+        card.classList.add('active-card');
+        
+        // Apply compact mode
+        applyCompactMode(cardGroup);
+        
+        // Update accordion section summary if needed
+        updateSectionSummaryForCard(card);
+    }
+    
+    /**
+     * Apply compact mode to a card group
+     * @param {HTMLElement} cardGroup - The card group
+     */
+    function applyCompactMode(cardGroup) {
+        // Add compact mode class
+        cardGroup.classList.add('compact-mode');
+        
+        // Get the selected card
+        const selectedCard = cardGroup.querySelector('.option-card.active-card');
+        if (!selectedCard) return;
+        
+        // Get the title text from the selected card
+        const titleText = selectedCard.querySelector('.option-title')?.textContent;
+        if (!titleText) return;
+        
+        // Create or update selection summary
+        let summary = cardGroup.querySelector('.selection-summary');
+        if (!summary) {
+            summary = document.createElement('div');
+            summary.className = 'selection-summary';
+            cardGroup.appendChild(summary);
+        }
+        
+        // Get the group's label
+        const labelElement = cardGroup.closest('.form-group')?.querySelector('label');
+        const labelText = labelElement ? labelElement.textContent.replace(':', '') : 'Selection';
+        
+        // Update summary
+        summary.innerHTML = `<strong>${labelText}:</strong> ${titleText}`;
+    }
+    
+    /**
+     * Toggle expansion of card group
+     * @param {HTMLElement} cardGroup - The card group to toggle
+     */
+    function toggleCardGroupExpansion(cardGroup) {
+        cardGroup.classList.toggle('compact-mode');
+        
+        // If expanding, scroll into view
+        if (!cardGroup.classList.contains('compact-mode')) {
+            setTimeout(() => {
+                cardGroup.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 50);
+        }
+    }
+    
+    /**
+     * Update section summary in accordion for a selected card
+     * @param {HTMLElement} card - The selected card
+     */
+    function updateSectionSummaryForCard(card) {
+        if (!isMobileView()) return;
+        
+        const cardGroup = card.closest('.option-cards');
+        if (!cardGroup) return;
+        
+        const section = cardGroup.closest('.form-section');
+        if (!section) return;
+        
+        const sectionId = section.id.replace('-section', '');
+        const accordionHeader = document.querySelector(`.accordion-header[data-section="${sectionId}"]`);
+        if (!accordionHeader) return;
+        
+        const summaryElement = accordionHeader.querySelector('.section-summary');
+        if (!summaryElement) return;
+        
+        const titleElement = card.querySelector('.option-title');
+        if (titleElement) {
+            summaryElement.textContent = titleElement.textContent;
+        }
+    }
+    
+    // ===== ACCORDION LAYOUT FUNCTIONALITY =====
+    
+    /**
+     * Initialize the accordion layout for mobile
+     */
+    function initAccordionLayout() {
+        createAccordionHeaders();
+        setupAccordionEvents();
+        updateSectionSummaries();
+    }
+    
+    /**
+     * Create accordion headers for each form section
+     */
+    function createAccordionHeaders() {
+        const sections = document.querySelectorAll('.form-section');
+        
+        sections.forEach(section => {
+            // Skip if already has an accordion header
+            if (section.accordionHeader) return;
+            
+            // Get section title
+            const heading = section.querySelector('h3');
+            if (!heading) return;
+            
+            const titleText = heading.textContent.split('\n')[0].trim();
+            const sectionId = section.id.replace('-section', '');
+            
+            // Create header
+            const header = document.createElement('div');
+            header.className = 'accordion-header';
+            header.dataset.section = sectionId;
+            header.innerHTML = `
+                <div class="accordion-title">
+                    <span>${titleText}</span>
+                    <div class="section-summary"></div>
+                </div>
+                <div class="accordion-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19 9l-7 7-7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+            `;
+            
+            // Insert before section
+            section.parentNode.insertBefore(header, section);
+            
+            // Store reference
+            section.accordionHeader = header;
+        });
+    }
+    
+    /**
+     * Set up accordion event listeners
+     */
+    function setupAccordionEvents() {
+        // Handle accordion header clicks
+        document.addEventListener('click', (e) => {
+            const header = e.target.closest('.accordion-header');
+            if (!header) return;
+            
+            const sectionId = header.dataset.section;
+            if (sectionId) {
+                toggleAccordionSection(sectionId);
+            }
+        });
+        
+        // Update summaries when form changes
+        document.getElementById('feedback-form')?.addEventListener('change', updateSectionSummaries);
+    }
+    
+    /**
+     * Toggle an accordion section
+     * @param {string} sectionId - ID of section to toggle
+     */
+    function toggleAccordionSection(sectionId) {
+        if (!isMobileView()) return;
+        
+        // Update state
+        FeedbackForgeState.update('ui', { currentSection: sectionId });
+        
+        // Update accordion UI
+        updateAccordionState(sectionId);
+    }
+    
+    /**
+     * Update the accordion state based on active section
+     * @param {string} activeSection - Active section ID
+     */
+    function updateAccordionState(activeSection) {
+        // Skip if not in mobile view
+        if (!isMobileView()) return;
+        
+        // Update headers
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            const isActive = header.dataset.section === activeSection;
+            header.classList.toggle('active', isActive);
+        });
+        
+        // Update sections
+        document.querySelectorAll('.form-section').forEach(section => {
+            const sectionId = section.id.replace('-section', '');
+            const isActive = sectionId === activeSection;
+            
+            section.classList.toggle('active-section', isActive);
+            
+            // Scroll active section into view
+            if (isActive) {
+                setTimeout(() => {
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+            }
+        });
+    }
+    
+    /**
+     * Update section summaries for accordion headers
+     */
+    function updateSectionSummaries() {
+        if (!isMobileView()) return;
+        
+        const formData = FeedbackForgeState.formData;
+        
+        // Context section summary
+        const contextSummary = document.querySelector('[data-section="context"] .section-summary');
+        if (contextSummary && formData.feedbackType) {
+            const typeName = getFeedbackTypeName(formData.feedbackType);
+            const recipientInfo = formData.recipientName ? 
+                ` for ${formData.recipientName}` : '';
+            
+            contextSummary.textContent = `${typeName}${recipientInfo}`;
+        }
+        
+        // Content section summary
+        const contentSummary = document.querySelector('[data-section="content"] .section-summary');
+        if (contentSummary) {
+            const model = formData.feedbackModel;
+            let fieldsCompleted = 0;
+            let totalFields = 0;
+            
+            if (model === 'simple') {
+                totalFields = 3;
+                if (formData.simple.specificStrengths) fieldsCompleted++;
+                if (formData.simple.areasForImprovement) fieldsCompleted++;
+                if (formData.simple.supportOffered) fieldsCompleted++;
+            } else if (model === 'sbi') {
+                totalFields = 3;
+                if (formData.sbi.situation) fieldsCompleted++;
+                if (formData.sbi.behavior) fieldsCompleted++;
+                if (formData.sbi.impact) fieldsCompleted++;
+            } else if (model === 'star') {
+                totalFields = 4;
+                if (formData.star.situation) fieldsCompleted++;
+                if (formData.star.task) fieldsCompleted++;
+                if (formData.star.action) fieldsCompleted++;
+                if (formData.star.result) fieldsCompleted++;
+            }
+            
+            if (fieldsCompleted > 0) {
+                contentSummary.textContent = `${fieldsCompleted}/${totalFields} fields completed`;
+            } else {
+                contentSummary.textContent = 'Not started';
+            }
+        }
+        
+        // Framing section summary
+        const framingSummary = document.querySelector('[data-section="framing"] .section-summary');
+        if (framingSummary) {
+            const tone = getToneName(formData.tone);
+            const elements = formData.psychSafetyElements.length;
+            
+            if (formData.tone) {
+                framingSummary.textContent = `${tone} tone, ${elements} safety elements`;
+            } else {
+                framingSummary.textContent = 'Not completed';
+            }
+        }
+    }
+    
+    /**
+     * Check if we should switch to mobile view
+     */
+    function checkForMobileView() {
+        const isMobile = isMobileView();
+        document.body.classList.toggle('mobile-accordion-view', isMobile);
+        
+        if (isMobile) {
+            updateAccordionState(FeedbackForgeState.ui.currentSection);
+            updateSectionSummaries();
+        }
+    }
+    
+    /**
+     * Check if current view is mobile view
+     * @returns {boolean} Is mobile view
+     */
+    function isMobileView() {
+        return window.innerWidth < MOBILE_BREAKPOINT;
+    }
+    
+    /**
+     * Debounce a function call
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Wait time in ms
+     * @returns {Function} - Debounced function
+     */
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
     }
     
     // Helper functions for displaying human-readable names
@@ -715,6 +1137,18 @@ const UIController = (function() {
         updateProgressIndicator,
         setupOptionCards,
         setupFormNavigation,
+        
+        // Shrinking cards API
+        initShrinkingCards,
+        toggleCardGroupExpansion,
+        applyCardSelection,
+        
+        // Accordion layout API
+        initAccordionLayout,
+        toggleAccordionSection,
+        updateSectionSummaries,
+        updateAccordionState,
+        isMobileView,
         
         // Helper methods
         getFeedbackTypeName,
