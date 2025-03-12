@@ -1066,6 +1066,57 @@
     };
 
     /**
+     * Fix scrollbar issues by managing container heights
+     */
+    function fixScrollbars() {
+        // Make the main container fill the viewport
+        document.body.style.overflow = 'hidden';
+        document.body.style.height = '100vh';
+        
+        // Adjust the container heights
+        const mainContent = document.querySelector('main.container');
+        if (mainContent) {
+            mainContent.style.height = 'calc(100vh - 140px)'; // Subtract header/footer height
+            mainContent.style.overflow = 'hidden';
+        }
+        
+        // Let only the form container and preview pane scroll independently
+        const formContainer = document.getElementById('form-container');
+        const previewPane = document.querySelector('.split-screen-right');
+        
+        if (formContainer) {
+            formContainer.style.height = 'calc(100vh - 230px)';
+            formContainer.style.overflow = 'auto';
+        }
+        
+        if (previewPane) {
+            previewPane.style.height = 'calc(100vh - 230px)';
+            previewPane.style.overflow = 'auto';
+        }
+        
+        // On mobile view, revert to normal scrolling behavior
+        if (window.innerWidth <= 768) {
+            document.body.style.overflow = 'auto';
+            document.body.style.height = 'auto';
+            
+            if (mainContent) {
+                mainContent.style.height = 'auto';
+                mainContent.style.overflow = 'visible';
+            }
+            
+            if (formContainer) {
+                formContainer.style.maxHeight = '70vh';
+                formContainer.style.height = 'auto';
+            }
+            
+            if (previewPane) {
+                previewPane.style.maxHeight = '70vh';
+                previewPane.style.height = 'auto';
+            }
+        }
+    }
+
+    /**
      * Main Application
      * Initializes and coordinates all modules
      */
@@ -1092,6 +1143,10 @@
             
             // Set up global access for compatibility with existing code
             this.setupGlobalAccess();
+
+            // Initialize scroll fix
+            fixScrollbars();
+            window.addEventListener('resize', fixScrollbars);
             
             console.log('FeedbackForge initialized successfully');
         },

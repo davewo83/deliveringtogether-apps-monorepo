@@ -15,6 +15,9 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Fix scrollbar issue */
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Layout */
@@ -28,12 +31,17 @@ body {
 /* Split-screen layout */
 .split-screen-container {
   max-width: 1400px; /* Wider container to accommodate the split layout */
+  /* Fix scrollbar issue */
+  height: calc(100vh - 140px);
+  overflow: hidden;
 }
 
 .split-screen {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
+  /* Fix scrollbar issue */
+  height: 100%;
 }
 
 .split-screen-left {
@@ -42,6 +50,9 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
+  /* Fix scrollbar issue */
+  height: 100%;
+  overflow: hidden;
 }
 
 .split-screen-right {
@@ -49,8 +60,9 @@ body {
   min-width: 0;
   position: sticky;
   top: 120px;
-  max-height: calc(100vh - 250px);
-  overflow-y: auto;
+  /* Fix scrollbar issue - remove max-height constraint */
+  height: 100%;
+  overflow: hidden;
 }
 
 /* Preview card specific styles */
@@ -115,6 +127,9 @@ main.container {
   flex: 1;
   padding-top: 2rem;
   padding-bottom: 2rem;
+  /* Fix scrollbar issue */
+  height: calc(100vh - 140px);
+  overflow: hidden;
 }
 
 /* Tabs */
@@ -710,29 +725,41 @@ legend {
 
 /* Ensure form container is properly scrollable */
 #form-container {
-    max-height: calc(100vh - 250px);
+    /* Fix scrollbar issue - improved setting */
+    height: calc(100% - 80px);
     overflow-y: auto;
     position: relative;
     scrollbar-width: thin;
     scrollbar-color: #0078d4 #f1f1f1;
 }
 
+/* Fixed scrollable right panel */
+.split-screen-right {
+    height: calc(100% - 80px);
+    overflow-y: auto;
+    position: relative;
+}
+
 /* Custom scrollbar styling for better visibility */
-#form-container::-webkit-scrollbar {
+#form-container::-webkit-scrollbar,
+.split-screen-right::-webkit-scrollbar {
     width: 8px;
 }
 
-#form-container::-webkit-scrollbar-track {
+#form-container::-webkit-scrollbar-track,
+.split-screen-right::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 4px;
 }
 
-#form-container::-webkit-scrollbar-thumb {
+#form-container::-webkit-scrollbar-thumb,
+.split-screen-right::-webkit-scrollbar-thumb {
     background-color: #0078d4;
     border-radius: 4px;
 }
 
-#form-container::-webkit-scrollbar-thumb:hover {
+#form-container::-webkit-scrollbar-thumb:hover,
+.split-screen-right::-webkit-scrollbar-thumb:hover {
     background-color: #005a9e;
 }
 
@@ -744,14 +771,27 @@ legend {
         font-size: 0.8rem;
     }
     
-    /* Make form container take available height on mobile */
-    #form-container {
+    /* Adjust for mobile view */
+    #form-container,
+    .split-screen-right {
         max-height: 70vh;
+        height: auto;
     }
     
     /* More prominent fade on mobile */
     .split-screen-left.has-overflow::after {
         height: 100px;
+    }
+    
+    body {
+        overflow: auto;
+        height: auto;
+    }
+    
+    main.container,
+    .split-screen-container {
+        height: auto;
+        overflow: visible;
     }
 }
 
