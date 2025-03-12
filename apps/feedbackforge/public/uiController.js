@@ -20,6 +20,7 @@ const UIController = (function() {
     function init() {
         setupTabs();
         setupModalHandling();
+        setupFormNavigation();
         
         // Add scroll indicator initialization
         initScrollIndicator();
@@ -222,6 +223,37 @@ const UIController = (function() {
     }
     
     /**
+     * Set up form navigation
+     */
+    function setupFormNavigation() {
+        // Next/Previous buttons
+        document.querySelectorAll('.next-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const currentSection = button.closest('.form-section');
+                const nextSectionId = button.dataset.next;
+                
+                // Validate current section
+                if (!FormHandler.validateSection(currentSection)) return;
+                
+                // Update UI state
+                FeedbackForgeState.update('ui', { currentSection: nextSectionId });
+                
+                // If we're on the review section, generate the summary
+                if (nextSectionId === 'review') {
+                    UIController.generateFormSummary();
+                }
+            });
+        });
+        
+        document.querySelectorAll('.prev-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const prevSectionId = button.dataset.prev;
+                FeedbackForgeState.update('ui', { currentSection: prevSectionId });
+            });
+        });
+    }
+    
+    /**
      * Set up modal handling
      */
     function setupModalHandling() {
@@ -287,14 +319,15 @@ const UIController = (function() {
     }
     
     /**
-     * Update progress indicator
+     * Update progress indicator for 3-step process
      * @param {string} currentStep - Current step ID
      */
     function updateProgressIndicator(currentStep) {
-        const steps = ['context', 'recipient', 'content', 'framing'];
+        // Change to three steps instead of four
+        const steps = ['context', 'content', 'framing'];
         
-        // Handle combined section (for streamlined form)
-        if (currentStep === 'combined-context') {
+        // Map the old recipient step to context if it still exists in the code
+        if (currentStep === 'recipient') {
             currentStep = 'context';
         }
         
@@ -317,10 +350,10 @@ const UIController = (function() {
     function generateFormSummary() {
         const data = FeedbackForgeState.formData;
         
-        // Create summary HTML
+        // Create summary HTML - updated for three sections
         let summaryHtml = `
             <div class="summary-section">
-                <h4>Feedback Context</h4>
+                <h4>Feedback Setup</h4>
                 <div class="summary-row">
                     <div class="summary-label">Feedback Type:</div>
                     <div class="summary-value">${getFeedbackTypeName(data.feedbackType)}</div>
@@ -337,17 +370,9 @@ const UIController = (function() {
                     <div class="summary-label">Workplace Situation:</div>
                     <div class="summary-value">${getSituationName(data.workplaceSituation)}</div>
                 </div>
-            </div>
-            
-            <div class="summary-section">
-                <h4>Recipient Information</h4>
                 <div class="summary-row">
-                    <div class="summary-label">Name:</div>
-                    <div class="summary-value">${data.recipientName}</div>
-                </div>
-                <div class="summary-row">
-                    <div class="summary-label">Role:</div>
-                    <div class="summary-value">${data.recipientRole || 'Not specified'}</div>
+                    <div class="summary-label">Recipient:</div>
+                    <div class="summary-value">${data.recipientName} (${data.recipientRole || 'No role specified'})</div>
                 </div>
                 <div class="summary-row">
                     <div class="summary-label">Communication Style:</div>
@@ -689,6 +714,7 @@ const UIController = (function() {
         generateFormSummary,
         updateProgressIndicator,
         setupOptionCards,
+        setupFormNavigation,
         
         // Helper methods
         getFeedbackTypeName,

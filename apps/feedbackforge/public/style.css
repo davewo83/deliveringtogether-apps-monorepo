@@ -151,7 +151,7 @@ main.container {
   display: block;
 }
 
-/* Progress indicator */
+/* Progress indicator - UPDATED for 3-step process */
 .progress-indicator {
   display: flex;
   justify-content: space-between;
@@ -372,12 +372,27 @@ footer p {
   line-height: 1.5;
 }
 
-/* Tooltip styles */
+/* IMPROVED Tooltip styles */
 .info-tooltip {
   cursor: help;
   color: #005a9e;
   font-size: 0.85rem;
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #e6f2ff;
+  text-align: center;
+  vertical-align: middle;
+  margin-left: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.info-tooltip:hover {
+  background-color: #cce5ff;
 }
 
 .info-tooltip[data-tooltip]:hover::after {
@@ -388,12 +403,30 @@ footer p {
   transform: translateX(-50%);
   background: #333;
   color: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
   font-size: 0.8rem;
-  white-space: nowrap;
-  z-index: 10;
-  margin-top: 8px;
+  white-space: normal; /* Allow text to wrap */
+  max-width: 250px; /* Set maximum width */
+  text-align: left;
+  z-index: 100;
+  margin-top: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  line-height: 1.4;
+}
+
+/* Add a position indicator arrow */
+.info-tooltip[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #333 transparent;
+  margin-top: -2px;
+  z-index: 101;
 }
 
 /* Responsive styles */
@@ -718,4 +751,80 @@ legend {
     .split-screen-left.has-overflow::after {
         height: 100px;
     }
+}
+
+/* Help text styling */
+.help-text {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 0.3rem;
+}
+
+/* Error message styling */
+.error-message {
+    color: #d32f2f;
+    font-size: 0.85rem;
+    margin-top: 0.3rem;
+}
+
+/* Recommended field highlighting */
+.recommended-field {
+    position: relative;
+}
+
+.recommended-field::before {
+    content: '⭐';
+    position: absolute;
+    top: 0;
+    left: -1rem;
+    color: #ffb100;
+    font-size: 0.9rem;
+}
+
+/* Section divider styling */
+.section-divider {
+    margin: 2rem 0;
+    border: none;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Setup section styling */
+.setup-section {
+    margin-bottom: 1.5rem;
+}
+
+.setup-section h4 {
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #005a9e;
+}
+
+/* Smaller option cards for delivery method and workplace situation */
+.small-cards {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.small-cards .option-card {
+    padding: 0.75rem;
+    min-width: auto;
+    flex: 1;
+    text-align: center;
+}
+
+/* Visual cue for active section */
+.form-section.active-section {
+    animation: fade-in 0.3s ease-in-out;
+}
+
+@keyframes fade-in {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+}
+
+/* Action buttons container */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
 }

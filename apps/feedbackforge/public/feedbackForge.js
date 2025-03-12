@@ -280,6 +280,28 @@
             
             // Set defaults based on feedback type
             this.updateSmartDefaults(FeedbackForgeState.formData.feedbackType);
+            
+            // Update context section now that it includes recipient information
+            const contextSection = document.getElementById('context-section');
+            if (contextSection) {
+                // Set recipient name value from state if available
+                const nameField = contextSection.querySelector('#recipient-name');
+                if (nameField && FeedbackForgeState.formData.recipientName) {
+                    nameField.value = FeedbackForgeState.formData.recipientName;
+                }
+                
+                // Set recipient role value from state if available
+                const roleField = contextSection.querySelector('#recipient-role');
+                if (roleField && FeedbackForgeState.formData.recipientRole) {
+                    roleField.value = FeedbackForgeState.formData.recipientRole;
+                }
+                
+                // Set personality type value from state if available
+                const personalityField = contextSection.querySelector('#personality-type');
+                if (personalityField && FeedbackForgeState.formData.personalityType) {
+                    personalityField.value = FeedbackForgeState.formData.personalityType;
+                }
+            }
         },
         
         /**
@@ -362,32 +384,6 @@
                     FeedbackGenerator.generateFeedback();
                 });
             }
-            
-            // Next/Previous buttons
-            document.querySelectorAll('.next-button').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const currentSection = button.closest('.form-section');
-                    const nextSectionId = button.dataset.next;
-                    
-                    // Validate current section
-                    if (!this.validateSection(currentSection)) return;
-                    
-                    // Update UI state
-                    FeedbackForgeState.update('ui', { currentSection: nextSectionId });
-                    
-                    // If we're on the review section, generate the summary
-                    if (nextSectionId === 'review') {
-                        UIController.generateFormSummary();
-                    }
-                });
-            });
-            
-            document.querySelectorAll('.prev-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    const prevSectionId = button.dataset.prev;
-                    FeedbackForgeState.update('ui', { currentSection: prevSectionId });
-                });
-            });
             
             // Reset button
             form.addEventListener('reset', () => {
