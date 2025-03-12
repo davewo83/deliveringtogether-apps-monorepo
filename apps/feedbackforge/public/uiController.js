@@ -20,7 +20,6 @@ const UIController = (function() {
     function init() {
         setupTabs();
         setupModalHandling();
-        setupUserFeedback();
         
         // Add scroll indicator initialization
         initScrollIndicator();
@@ -233,35 +232,6 @@ const UIController = (function() {
                 closeModal();
             }
         });
-    }
-    
-    /**
-     * Set up user feedback submission
-     */
-    function setupUserFeedback() {
-        // User feedback form
-        const submitFeedbackBtn = document.getElementById('submit-feedback');
-        if (submitFeedbackBtn) {
-            submitFeedbackBtn.addEventListener('click', function() {
-                const feedbackText = document.getElementById('user-feedback').value.trim();
-                if (feedbackText) {
-                    // In a real app, this would submit to a server
-                    // For now, we just show a thank you message
-                    document.getElementById('user-feedback').value = '';
-                    alert('Thank you for your feedback! We appreciate your input.');
-                    
-                    // Save feedback to localStorage for demo purposes
-                    const userFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
-                    userFeedback.push({
-                        text: feedbackText,
-                        date: new Date().toISOString()
-                    });
-                    localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
-                } else {
-                    alert('Please enter some feedback before submitting.');
-                }
-            });
-        }
     }
     
     /**
