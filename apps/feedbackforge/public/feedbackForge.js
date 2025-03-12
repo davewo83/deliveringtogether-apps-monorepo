@@ -2,13 +2,7 @@
  * FeedbackForge - Consolidated JavaScript with State Management
  * 
  * This script consolidates all FeedbackForge functionality into a single, modular
- * codebase with proper state management. It replaces the following files:
- * - feedback-generator.js
- * - feedback-generator-core.js
- * - disc-integration.js
- * - form-streamline.js
- * - navigation-fix.js
- * - examples-data.js (now integrated)
+ * codebase with proper state management.
  */
 
 // Immediately-Invoked Function Expression to avoid polluting global scope
@@ -1425,7 +1419,6 @@
         init: function() {
             this.setupTabs();
             this.setupModalHandling();
-            this.setupGuidedTour();
             this.setupTemplatesSystem();
         },
         
@@ -1612,21 +1605,6 @@
             if (modalContainer) {
                 modalContainer.classList.remove('active');
                 document.body.style.overflow = ''; // Restore scrolling
-            }
-        },
-        
-        /**
-         * Set up guided tour button
-         */
-        setupGuidedTour: function() {
-            document.getElementById('tour-button')?.addEventListener('click', this.startGuidedTour);
-            
-            // Show tour on first visit
-            if (!localStorage.getItem('tourShown')) {
-                setTimeout(function() {
-                    UIController.startGuidedTour();
-                    localStorage.setItem('tourShown', 'true');
-                }, 1000);
             }
         },
         
@@ -1942,140 +1920,6 @@
             this.showModal(title, content);
         },
         
-        /**
-         * Start the guided tour
-         */
-        startGuidedTour: function() {
-            UIController.showModal(
-                'Welcome to FeedbackForge!', 
-                `<div class="tour-content">
-                    <p>This guided tour will show you how to create effective, evidence-based feedback using FeedbackForge.</p>
-                    <p>FeedbackForge helps you create feedback that is:</p>
-                    <ul>
-                        <li>Structured using proven models</li>
-                        <li>Tailored to the recipient's communication style</li>
-                        <li>Framed to enhance psychological safety</li>
-                        <li>Contextualized for your specific situation</li>
-                    </ul>
-                    <p>Click "Next" to continue the tour, or "Skip" to exit.</p>
-                    <div class="tour-navigation">
-                        <button class="secondary-button" onclick="document.querySelector('.close-modal').click()">Skip Tour</button>
-                        <button class="primary-button" onclick="UIController.showTourStep(1)">Next</button>
-                    </div>
-                </div>`
-            );
-        },
-        
-        /**
-         * Show a specific tour step
-         * @param {number} step - Tour step index
-         */
-        showTourStep: function(step) {
-            let title = "";
-            let content = "";
-            
-            switch(step) {
-                case 1:
-                    title = "Step 1: Choose Your Context";
-                    content = `<div class="tour-content">
-                        <p>Start by selecting the type of feedback you want to provide and the model you'll use to structure it.</p>
-                        <p><strong>Feedback Type</strong> determines the overall purpose:</p>
-                        <ul>
-                            <li>Recognition - Acknowledge achievements</li>
-                            <li>Improvement - Address areas for development</li>
-                            <li>Coaching - Guide progress toward specific goals</li>
-                            <li>Developmental - Focus on long-term growth</li>
-                        </ul>
-                        <p><strong>Feedback Model</strong> provides a structured framework:</p>
-                        <ul>
-                            <li>Simple - Basic strengths/improvements format</li>
-                            <li>SBI - Situation-Behavior-Impact</li>
-                            <li>STAR - Situation-Task-Action-Result</li>
-                        </ul>
-                        <div class="tour-navigation">
-                            <button class="secondary-button" onclick="document.querySelector('.close-modal').click()">Exit Tour</button>
-                            <button class="primary-button" onclick="UIController.showTourStep(2)">Next</button>
-                        </div>
-                    </div>`;
-                    break;
-                case 2:
-                    title = "Step 2: Understand Your Recipient";
-                    content = `<div class="tour-content">
-                        <p>Effective feedback is tailored to the recipient's communication preferences.</p>
-                        <p>FeedbackForge uses the DISC framework to customize feedback language:</p>
-                        <ul>
-                            <li><strong>Direct (D)</strong> - Prefers concise, results-focused communication</li>
-                            <li><strong>Interactive (I)</strong> - Responds to enthusiastic, relationship-oriented messages</li>
-                            <li><strong>Supportive (S)</strong> - Appreciates patient, methodical approaches</li>
-                            <li><strong>Analytical (C)</strong> - Values detailed, logical explanations</li>
-                        </ul>
-                        <p>Select the style that best matches your recipient's preferences.</p>
-                        <div class="tour-navigation">
-                            <button class="secondary-button" onclick="document.querySelector('.close-modal').click()">Exit Tour</button>
-                            <button class="primary-button" onclick="UIController.showTourStep(3)">Next</button>
-                        </div>
-                    </div>`;
-                    break;
-                // Add remaining tour steps
-                case 3:
-                    title = "Step 3: Structure Your Content";
-                    content = `<div class="tour-content">
-                        <p>The content section changes based on your selected feedback model.</p>
-                        <p>Research shows that specific, behavior-focused feedback is most effective. Regardless of model, focus on:</p>
-                        <ul>
-                            <li>Observable behaviors rather than assumptions</li>
-                            <li>Specific examples rather than generalizations</li>
-                            <li>Impact on others, the team, or the organization</li>
-                            <li>Growth-oriented language rather than fixed judgments</li>
-                        </ul>
-                        <p>You can click "See examples" throughout the form to view model-specific examples.</p>
-                        <div class="tour-navigation">
-                            <button class="secondary-button" onclick="document.querySelector('.close-modal').click()">Exit Tour</button>
-                            <button class="primary-button" onclick="UIController.showTourStep(4)">Next</button>
-                        </div>
-                    </div>`;
-                    break;
-                case 4:
-                    title = "Step 4: Frame for Psychological Safety";
-                    content = `<div class="tour-content">
-                        <p>Psychological safety is essential for feedback to be received effectively.</p>
-                        <p>FeedbackForge offers options to enhance psychological safety:</p>
-                        <ul>
-                            <li><strong>Separate performance from identity</strong> - Focus on actions, not character</li>
-                            <li><strong>Frame as learning opportunity</strong> - Emphasize growth potential</li>
-                            <li><strong>Use collaborative approach</strong> - Position as a shared journey</li>
-                            <li><strong>Focus on future improvement</strong> - Look forward, not backward</li>
-                        </ul>
-                        <p>Choose a tone that complements your recipient's communication style.</p>
-                        <div class="tour-navigation">
-                            <button class="secondary-button" onclick="document.querySelector('.close-modal').click()">Exit Tour</button>
-                            <button class="primary-button" onclick="UIController.showTourStep(5)">Next</button>
-                        </div>
-                    </div>`;
-                    break;
-                case 5:
-                    title = "Step 5: Preview and Generate";
-                    content = `<div class="tour-content">
-                        <p>Before finalizing your feedback, you can:</p>
-                        <ul>
-                            <li><strong>Preview</strong> - See how your feedback will look</li>
-                            <li><strong>Edit</strong> - Make adjustments to the generated text</li>
-                            <li><strong>Save as Template</strong> - Store your settings for future use</li>
-                        </ul>
-                        <p>You can access saved templates in the Templates tab.</p>
-                        <p>We hope you enjoy using FeedbackForge to create more effective feedback!</p>
-                        <div class="tour-navigation">
-                            <button class="primary-button" onclick="document.querySelector('.close-modal').click()">Start Creating</button>
-                        </div>
-                    </div>`;
-                    break;
-            }
-            
-            if (title && content) {
-                this.showModal(title, content);
-            }
-        },
-        
         // Helper functions for displaying human-readable names
         
         /**
@@ -2233,7 +2077,6 @@
             window.UIController = {
                 showModal: UIController.showModal,
                 closeModal: UIController.closeModal,
-                showTourStep: UIController.showTourStep,
                 getCommunicationStyleName: UIController.getCommunicationStyleName
             };
             
