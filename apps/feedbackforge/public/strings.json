@@ -72,11 +72,6 @@
       "name": "Coaching",
       "description": "Guide development toward specific goals",
       "helpText": "Guide development toward specific goals with clear examples"
-    },
-    "developmental": {
-      "name": "Developmental",
-      "description": "Focus on long-term career growth",
-      "helpText": "Focus on long-term growth opportunities aligned with career goals"
     }
   },
   "communicationStyles": {
@@ -170,26 +165,22 @@
       "D": {
         "recognition": "I want to highlight some impressive results you've achieved recently.",
         "improvement": "I want to share some direct feedback about where I see opportunities for even better results.",
-        "coaching": "Let's discuss how to optimise your approach for maximum impact.",
-        "developmental": "I've identified some specific areas where focused development could significantly improve your effectiveness."
+        "coaching": "Let's discuss how to optimise your approach for maximum impact."
       },
       "I": {
         "recognition": "I'm excited to share some thoughts about the positive impact you've been making!",
         "improvement": "I'd like to discuss some ideas about how we might collaborate to enhance certain aspects of your work.",
-        "coaching": "I'm looking forward to exploring some development opportunities with you that could be really energising.",
-        "developmental": "I see some exciting growth opportunities that would leverage your natural strengths even further."
+        "coaching": "I'm looking forward to exploring some development opportunities with you that could be really energising."
       },
       "S": {
         "recognition": "I appreciate your consistent contributions and wanted to acknowledge the positive difference you've been making.",
         "improvement": "I'd like to share some thoughts on how we might build upon your solid foundation to enhance certain areas.",
-        "coaching": "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress.",
-        "developmental": "Building on your reliable performance, I've identified some development areas that align with your methodical approach."
+        "coaching": "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress."
       },
       "C": {
         "recognition": "Based on my analysis of your recent work, I've identified several noteworthy accomplishments to discuss.",
         "improvement": "After reviewing your work in detail, I've prepared some specific feedback on areas that could benefit from refinement.",
-        "coaching": "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness.",
-        "developmental": "Looking at the data from your recent performance, I've identified some specific development opportunities with measurable outcomes."
+        "coaching": "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness."
       },
       "default": "I appreciate you taking the time to discuss this feedback."
     },

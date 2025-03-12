@@ -41,46 +41,28 @@
                 "title": "Delegation Development",
                 "content": "You've been taking on increasing responsibility, which is excellent. To continue growing, developing your delegation skills will be important. I've noticed you sometimes hold onto tasks that could be delegated, which limits both your capacity and team members' development opportunities."
             }
-        ],
-        "developmental": [
-            {
-                "title": "Leadership Path Development",
-                "content": "Based on your expressed interest in moving toward a leadership role, I'd like to focus on developing your people management skills. I've identified three specific areas that would prepare you for future leadership opportunities: giving constructive feedback, managing performance conversations, and strategic planning."
-            },
-            {
-                "title": "Technical Specialization",
-                "content": "Your career aspirations in technical architecture will require deepening your expertise in cloud infrastructure. I see an opportunity for you to develop specialized knowledge in this area, which would position you well for the technical leadership path you're interested in pursuing."
-            },
-            {
-                "title": "Cross-functional Understanding",
-                "content": "To prepare for the broader business role you're interested in, developing a stronger understanding of how our marketing and sales functions operate would be valuable. I've identified some specific opportunities for you to collaborate with these teams that would build this knowledge."
-            }
         ]
     },
     "discStyles": {
         "D": {
             "recognition": "Your decisive leadership on the Thomson project delivered exceptional results. The initiative generated £175K in new revenue, 15% above target, and was completed two weeks ahead of schedule. This performance clearly demonstrates your ability to drive high-impact outcomes efficiently.",
             "improvement": "The last three client presentations would have greater impact with more thorough preparation. Currently spending 1-2 hours in preparation vs. recommended 4-5 hours for complex pitches. Let's implement a structured pre-presentation checklist to ensure all key points are covered and supporting data is compelling.",
-            "coaching": "To maximize your effectiveness in strategic planning, focus on incorporating more team input before finalizing decisions. I recommend implementing a systematic stakeholder consultation process that balances speed with buy-in, allowing you to maintain momentum while leveraging diverse perspectives.",
-            "developmental": "Your career goal of executive leadership requires developing enterprise-wide strategic vision. I recommend three specific actions: 1) Lead the cross-departmental efficiency initiative, 2) Join the quarterly strategic planning committee, and 3) Establish monthly mentoring sessions with our COO."
+            "coaching": "To maximize your effectiveness in strategic planning, focus on incorporating more team input before finalizing decisions. I recommend implementing a systematic stakeholder consultation process that balances speed with buy-in, allowing you to maintain momentum while leveraging diverse perspectives."
         },
         "I": {
             "recognition": "I'm thrilled with the energy and enthusiasm you brought to the client event last week! Your engaging presentation style and ability to connect with everyone in the room created such a positive atmosphere. Several clients specifically mentioned how your approach made complex concepts accessible and exciting!",
             "improvement": "I'd love to discuss how we might enhance the follow-through on your creative ideas. You have such fantastic concepts in team brainstorming! By adding some structure to track implementation details, we could see even more of your brilliant ideas come to life. What approaches do you think might work well with your style?",
-            "coaching": "Your natural ability to build relationships is such a valuable strength! I'm excited to explore how we might channel this talent into developing more strategic client partnerships. Would you be interested in creating an engagement plan for our top accounts that leverages your relationship-building expertise in a more systematic way?",
-            "developmental": "I see so much potential for you to grow into the team leadership role you're passionate about! Your natural ability to inspire others is a fantastic foundation. Let's explore some fun, interactive leadership development opportunities that would build on this strength while developing complementary skills in project structure and accountability frameworks."
+            "coaching": "Your natural ability to build relationships is such a valuable strength! I'm excited to explore how we might channel this talent into developing more strategic client partnerships. Would you be interested in creating an engagement plan for our top accounts that leverages your relationship-building expertise in a more systematic way?"
         },
         "S": {
             "recognition": "I truly appreciate your consistent, reliable support of the team throughout the system transition. Your methodical approach to helping each team member learn the new processes, particularly your patience with those who struggled initially, ensured we maintained quality service during a challenging time. The team's smooth adjustment is a direct result of your steady support.",
             "improvement": "I've noticed that sometimes in team discussions, your valuable insights aren't being fully shared, especially when conversations move quickly. Your perspective is important to our decision-making process. Perhaps we could explore some comfortable ways for you to ensure your thoughts are included, such as a structured round-robin approach in meetings or having a prepared points list.",
-            "coaching": "Your natural strength in creating harmonious team environments is really valuable. As we discussed in your development plan, gradually stepping into more project leadership would build on this foundation. What if we identified a small upcoming project where you could practice taking the lead, with regular check-ins to provide support throughout the process?",
-            "developmental": "Based on your interest in developing conflict resolution skills, I've identified a step-by-step development path that builds on your natural empathy while gradually increasing exposure to challenging conversations. We could start with the structured workshop next month, followed by observing mediation sessions, before moving to facilitated practice scenarios."
+            "coaching": "Your natural strength in creating harmonious team environments is really valuable. As we discussed in your development plan, gradually stepping into more project leadership would build on this foundation. What if we identified a small upcoming project where you could practice taking the lead, with regular check-ins to provide support throughout the process?"
         },
         "C": {
             "recognition": "Based on my analysis of the project outcomes, your methodical approach to the database migration delivered exceptional results. The error rate of 0.003% is 99.7% below industry average for similar transitions, and your comprehensive documentation will serve as the standard template for future migrations. This level of precision significantly reduces our operational risk profile.",
             "improvement": "In reviewing the last three client reports, I've identified that while the technical analysis is thorough (100% accuracy in calculations), the executive summaries could be more accessible to non-technical stakeholders. Specifically, the key findings would have greater impact if presented with visual data representations and explicit business implications. Would it be helpful to review some examples of effective executive communication formats?",
-            "coaching": "To enhance your effectiveness in cross-functional collaboration, I've identified a specific opportunity to build on your analytical strengths. The data insights you provide are invaluable, but could be more impactful with adjustments to presentation format and timing. Would it be useful to analyze the decision-making processes of other departments to optimize how your analysis feeds into their workflows?",
-            "developmental": "For your expressed goal of technical leadership advancement, I've conducted a gap analysis between your current skill profile and the role requirements. Your technical expertise exceeds requirements in 7 of 9 core areas. The development opportunity lies in two specific dimensions: translating technical concepts for executive audiences and building consensus across competing technical priorities. I've identified precise metrics and development activities for each area."
+            "coaching": "To enhance your effectiveness in cross-functional collaboration, I've identified a specific opportunity to build on your analytical strengths. The data insights you provide are invaluable, but could be more impactful with adjustments to presentation format and timing. Would it be useful to analyze the decision-making processes of other departments to optimize how your analysis feeds into their workflows?"
         }
     },
     "feedbackModels": {

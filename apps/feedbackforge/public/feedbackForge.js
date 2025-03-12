@@ -460,8 +460,6 @@
                 recommendedModel = 'simple';
             } else if (feedbackType === 'coaching') {
                 recommendedModel = 'sbi';
-            } else if (feedbackType === 'developmental') {
-                recommendedModel = 'star';
             }
             
             // Update model if it's not already set
@@ -499,8 +497,6 @@
                 recommendedElements = ['separate-identity', 'learning-opportunity'];
             } else if (feedbackType === 'coaching') {
                 recommendedElements = ['learning-opportunity', 'collaborative'];
-            } else if (feedbackType === 'developmental') {
-                recommendedElements = ['future-focused', 'learning-opportunity'];
             }
             
             // Update state
@@ -526,8 +522,6 @@
                 recommendedTone = 'direct';
             } else if (feedbackType === 'coaching') {
                 recommendedTone = 'coaching';
-            } else if (feedbackType === 'developmental') {
-                recommendedTone = 'inquiring';
             }
             
             // Update state
