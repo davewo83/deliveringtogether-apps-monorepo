@@ -677,12 +677,13 @@ const UIController = (function() {
                     
                     // Update the live preview
                     LivePreviewManager.updatePreview();
-                    
-                    // For shrinking cards functionality
-                    const card = this.nextElementSibling;
-                    if (card && card.classList.contains('option-card')) {
-                        applyCardSelection(card);
-                    }
+                });
+            });
+            
+            // Add click event listener to each card
+            group.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    handleCardClick(this);
                 });
             });
         });
@@ -692,6 +693,7 @@ const UIController = (function() {
     
     /**
      * Initialize the shrinking cards functionality
+     * All cards now start expanded, even when there's a selection
      */
     function initShrinkingCards() {
         // Add shrinking-cards class to all option cards groups
@@ -701,15 +703,106 @@ const UIController = (function() {
             // Add expand button
             addExpandButton(group);
             
-            // Check if there's a selected card
+            // Check if there's a selected card and mark it as active, but DON'T collapse
             const selectedRadio = group.querySelector('input[type="radio"]:checked');
             if (selectedRadio) {
                 const card = selectedRadio.nextElementSibling;
                 if (card) {
-                    applyCardSelection(card);
+                    // Just apply the active class, don't collapse
+                    markCardAsActive(card);
+                    
+                    // Create the selection summary but keep it hidden until collapsed
+                    createSelectionSummary(group, card);
                 }
             }
         });
+    }
+    
+    /**
+     * Mark a card as active without collapsing the group
+     * @param {HTMLElement} card - The selected card
+     */
+    function markCardAsActive(card) {
+        const cardGroup = card.closest('.option-cards');
+        if (!cardGroup) return;
+        
+        // Remove active class from all cards
+        cardGroup.querySelectorAll('.option-card').forEach(c => {
+            c.classList.remove('active-card');
+        });
+        
+        // Add active class to selected card
+        card.classList.add('active-card');
+        
+        // Update accordion section summary if needed
+        updateSectionSummaryForCard(card);
+    }
+    
+    /**
+     * Create the selection summary for a card but don't show it yet
+     * @param {HTMLElement} cardGroup - The card group
+     * @param {HTMLElement} selectedCard - The selected card
+     */
+    function createSelectionSummary(cardGroup, selectedCard) {
+        // Get the title text from the selected card
+        const titleText = selectedCard.querySelector('.option-title')?.textContent;
+        if (!titleText) return;
+        
+        // Create or update selection summary
+        let summary = cardGroup.querySelector('.selection-summary');
+        if (!summary) {
+            summary = document.createElement('div');
+            summary.className = 'selection-summary';
+            cardGroup.appendChild(summary);
+        }
+        
+        // Get the group's label
+        const labelElement = cardGroup.closest('.form-group')?.querySelector('label');
+        const labelText = labelElement ? labelElement.textContent.replace(':', '') : 'Selection';
+        
+        // Update summary
+        summary.innerHTML = `<strong>${labelText}:</strong> ${titleText}`;
+    }
+    
+    /**
+     * Apply selection styling to a card and update group
+     * Now collapses the group when a card is clicked
+     * @param {HTMLElement} card - The selected card
+     */
+    function applyCardSelection(card) {
+        const cardGroup = card.closest('.option-cards');
+        if (!cardGroup) return;
+        
+        // First just mark the card as active
+        markCardAsActive(card);
+        
+        // Create/update the selection summary
+        createSelectionSummary(cardGroup, card);
+        
+        // Now apply compact mode to collapse the cards
+        cardGroup.classList.add('compact-mode');
+        
+        // Update accordion section summary if needed
+        updateSectionSummaryForCard(card);
+    }
+    
+    /**
+     * New function to handle option card click events
+     * @param {HTMLElement} card - The clicked card
+     */
+    function handleCardClick(card) {
+        const input = card.previousElementSibling;
+        if (input && input.type === 'radio') {
+            // Select the radio button
+            input.checked = true;
+            
+            // Trigger change event to update state
+            const event = new Event('change', { bubbles: true });
+            input.dispatchEvent(event);
+            
+            // Apply card selection which now collapses the group
+            applyCardSelection(card);
+        }
     }
     
     /**
@@ -740,61 +833,6 @@ const UIController = (function() {
         
         // Add to card group
         cardGroup.appendChild(expandButton);
-    }
-    
-    /**
-     * Apply selection styling to a card and update group
-     * @param {HTMLElement} card - The selected card
-     */
-    function applyCardSelection(card) {
-        const cardGroup = card.closest('.option-cards');
-        if (!cardGroup) return;
-        
-        // Remove active class from all cards
-        cardGroup.querySelectorAll('.option-card').forEach(c => {
-            c.classList.remove('active-card');
-        });
-        
-        // Add active class to selected card
-        card.classList.add('active-card');
-        
-        // Apply compact mode
-        applyCompactMode(cardGroup);
-        
-        // Update accordion section summary if needed
-        updateSectionSummaryForCard(card);
-    }
-    
-    /**
-     * Apply compact mode to a card group
-     * @param {HTMLElement} cardGroup - The card group
-     */
-    function applyCompactMode(cardGroup) {
-        // Add compact mode class
-        cardGroup.classList.add('compact-mode');
-        
-        // Get the selected card
-        const selectedCard = cardGroup.querySelector('.option-card.active-card');
-        if (!selectedCard) return;
-        
-        // Get the title text from the selected card
-        const titleText = selectedCard.querySelector('.option-title')?.textContent;
-        if (!titleText) return;
-        
-        // Create or update selection summary
-        let summary = cardGroup.querySelector('.selection-summary');
-        if (!summary) {
-            summary = document.createElement('div');
-            summary.className = 'selection-summary';
-            cardGroup.appendChild(summary);
-        }
-        
-        // Get the group's label
-        const labelElement = cardGroup.closest('.form-group')?.querySelector('label');
-        const labelText = labelElement ? labelElement.textContent.replace(':', '') : 'Selection';
-        
-        // Update summary
-        summary.innerHTML = `<strong>${labelText}:</strong> ${titleText}`;
     }
     
     /**
@@ -1142,6 +1180,9 @@ const UIController = (function() {
         initShrinkingCards,
         toggleCardGroupExpansion,
         applyCardSelection,
+        markCardAsActive,
+        createSelectionSummary,
+        handleCardClick,
         
         // Accordion layout API
         initAccordionLayout,
