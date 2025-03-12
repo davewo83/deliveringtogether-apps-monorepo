@@ -25,6 +25,66 @@ body {
   padding: 0 1.5rem;
 }
 
+/* Split-screen layout */
+.split-screen-container {
+  max-width: 1400px; /* Wider container to accommodate the split layout */
+}
+
+.split-screen {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.split-screen-left {
+  flex: 1;
+  min-width: 0; /* Prevent flex item from overflowing its container */
+}
+
+.split-screen-right {
+  flex: 1;
+  min-width: 0;
+  position: sticky;
+  top: 2rem;
+}
+
+/* Preview card specific styles */
+.preview-card {
+  transition: all 0.3s ease;
+}
+
+.preview-badge {
+  display: inline-block;
+  background-color: #f0f7ff;
+  color: #005a9e;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.5rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  font-weight: normal;
+  vertical-align: middle;
+}
+
+.preview-controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.preview-controls button {
+  flex: 1;
+}
+
+/* Highlight effect for live updates */
+.highlight-update {
+  animation: highlight 1s ease;
+}
+
+@keyframes highlight {
+  0% { background-color: rgba(0, 90, 158, 0.1); }
+  100% { background-color: transparent; }
+}
+
 /* Header */
 header {
   background-color: white;
@@ -143,8 +203,8 @@ main.container {
 
 .form-section {
   display: none;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -165,7 +225,7 @@ main.container {
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   padding: 0 0.75rem;
   flex: 1;
   min-width: 250px;
@@ -266,8 +326,8 @@ button {
 .form-navigation {
   display: flex;
   justify-content: space-between;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid #f0f0f0;
 }
 
@@ -303,7 +363,42 @@ footer p {
   line-height: 1.5;
 }
 
+/* Tooltip styles */
+.info-tooltip {
+  cursor: help;
+  color: #005a9e;
+  font-size: 0.85rem;
+  position: relative;
+}
+
+.info-tooltip[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  z-index: 10;
+  margin-top: 8px;
+}
+
 /* Responsive styles */
+@media (max-width: 1024px) {
+  .split-screen {
+    flex-direction: column;
+  }
+  
+  .split-screen-right {
+    position: static;
+    margin-top: 1.5rem;
+  }
+}
+
 @media (max-width: 768px) {
   .form-row {
     flex-direction: column;
@@ -339,8 +434,6 @@ legend {
   padding: 0;
   margin-bottom: 0.5rem;
 }
-
-/* Add these styles to style.css */
 
 /* Modal container styling */
 .modal-container {

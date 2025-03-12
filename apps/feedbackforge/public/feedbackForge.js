@@ -610,6 +610,9 @@
                 
                 // Show the default model fields
                 this.updateModelFields('simple');
+                
+                // Update the live preview
+                LivePreviewManager.updatePreview();
             });
         },
 
@@ -1464,7 +1467,7 @@
          * @param {string} currentStep - Current step ID
          */
         updateProgressIndicator: function(currentStep) {
-            const steps = ['context', 'recipient', 'content', 'framing', 'review'];
+            const steps = ['context', 'recipient', 'content', 'framing'];
             
             // Handle combined section (for streamlined form)
             if (currentStep === 'combined-context') {
@@ -1853,6 +1856,491 @@
     };
 
     /**
+     * LivePreviewManager
+     * Manages the real-time generation and display of feedback previews
+     */
+    const LivePreviewManager = {
+        // Timeout for debouncing input events
+        debounceTimeout: null,
+        
+        // Preview elements
+        previewElement: null,
+        previewModelElement: null,
+        previewStyleElement: null,
+        previewToneElement: null,
+        
+        /**
+         * Initialize the live preview manager
+         */
+        init: function() {
+            // Cache DOM elements
+            this.previewElement = document.getElementById('live-preview');
+            this.previewModelElement = document.getElementById('preview-model');
+            this.previewStyleElement = document.getElementById('preview-style');
+            this.previewToneElement = document.getElementById('preview-tone');
+            
+            // Set up event listeners
+            this.setupEventListeners();
+            
+            // Set up copy and download buttons
+            this.setupControls();
+            
+            // Initial preview generation
+            this.updatePreview();
+        },
+        
+        /**
+         * Set up event listeners for form inputs
+         */
+        setupEventListeners: function() {
+            const form = document.getElementById('feedback-form');
+            
+            // Listen to all input events on the form
+            form.addEventListener('input', this.handleFormInput.bind(this));
+            form.addEventListener('change', this.handleFormChange.bind(this));
+            
+            // Navigation button listeners
+            document.querySelectorAll('.next-button, .prev-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Short delay to allow form state to update
+                    setTimeout(() => this.updatePreview(), 100);
+                });
+            });
+        },
+        
+        /**
+         * Handle input events (typing in text fields)
+         * @param {Event} event - The input event
+         */
+        handleFormInput: function(event) {
+            // Use debounce to prevent too many updates while typing
+            clearTimeout(this.debounceTimeout);
+            this.debounceTimeout = setTimeout(() => {
+                this.updatePreview();
+            }, 300); // 300ms debounce for smooth experience
+        },
+        
+        /**
+         * Handle change events (select dropdowns, checkboxes)
+         * @param {Event} event - The change event
+         */
+        handleFormChange: function(event) {
+            // Update preview immediately for select changes
+            this.updatePreview();
+            
+            // Update the model info display
+            if (event.target.id === 'feedback-model') {
+                this.previewModelElement.textContent = UIController.getModelName(event.target.value);
+            } else if (event.target.id === 'personality-type') {
+                this.previewStyleElement.textContent = UIController.getCommunicationStyleName(event.target.value);
+            } else if (event.target.id === 'tone') {
+                this.previewToneElement.textContent = UIController.getToneName(event.target.value);
+            }
+        },
+        
+        /**
+         * Set up preview controls (copy, download)
+         */
+        setupControls: function() {
+            // Copy button
+            document.getElementById('copy-feedback')?.addEventListener('click', () => {
+                if (!this.previewElement) return;
+                
+                navigator.clipboard.writeText(this.previewElement.textContent)
+                    .then(() => {
+                        const button = document.getElementById('copy-feedback');
+                        const originalText = button.textContent;
+                        button.textContent = 'Copied!';
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Could not copy text: ', err);
+                    });
+            });
+            
+            // Download button
+            document.getElementById('download-feedback')?.addEventListener('click', () => {
+                if (!this.previewElement) return;
+                
+                const recipientName = document.getElementById('recipient-name')?.value || 'team-member';
+                const dateStr = new Date().toISOString().slice(0,10);
+                const filename = `feedback-for-${recipientName}-${dateStr}.txt`.toLowerCase().replace(/\s+/g, '-');
+                
+                const blob = new Blob([this.previewElement.textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        },
+        
+        /**
+         * Update the preview with the current form data
+         */
+        updatePreview: function() {
+            if (!this.previewElement) return;
+            
+            // Update form data in state
+            this.updateStateFromForm();
+            
+            // Generate feedback based on current state
+            const feedbackScript = this.generateFeedback();
+            
+            // Apply highlight effect to show changes
+            this.previewElement.classList.add('highlight-update');
+            setTimeout(() => {
+                this.previewElement.classList.remove('highlight-update');
+            }, 1000);
+            
+            // Update the preview content
+            this.previewElement.innerHTML = feedbackScript.replace(/\n/g, '<br>');
+        },
+        
+        /**
+         * Update FeedbackForgeState with current form values
+         */
+        updateStateFromForm: function() {
+            const form = document.getElementById('feedback-form');
+            if (!form) return;
+            
+            // Update basic fields
+            const formData = {
+                feedbackType: form.querySelector('#feedback-type')?.value || 'recognition',
+                feedbackModel: form.querySelector('#feedback-model')?.value || 'simple',
+                deliveryMethod: form.querySelector('#delivery-method')?.value || 'face-to-face',
+                workplaceSituation: form.querySelector('#workplace-situation')?.value || 'normal',
+                recipientName: form.querySelector('#recipient-name')?.value || '',
+                recipientRole: form.querySelector('#recipient-role')?.value || '',
+                personalityType: form.querySelector('#personality-type')?.value || 'D',
+                tone: form.querySelector('#tone')?.value || 'supportive',
+                followUp: form.querySelector('#follow-up')?.value || ''
+            };
+            
+            // Update psychological safety elements
+            const psychSafetyElements = [];
+            form.querySelectorAll('input[name="psychSafetyElements"]:checked').forEach(checkbox => {
+                psychSafetyElements.push(checkbox.value);
+            });
+            formData.psychSafetyElements = psychSafetyElements;
+            
+            // Update model-specific fields
+            const simpleData = {
+                specificStrengths: form.querySelector('#specific-strengths')?.value || '',
+                areasForImprovement: form.querySelector('#areas-improvement')?.value || '',
+                supportOffered: form.querySelector('#support-offered')?.value || ''
+            };
+            
+            const sbiData = {
+                situation: form.querySelector('#situation')?.value || '',
+                behavior: form.querySelector('#behavior')?.value || '',
+                impact: form.querySelector('#impact')?.value || ''
+            };
+            
+            const starData = {
+                situation: form.querySelector('#star-situation')?.value || '',
+                task: form.querySelector('#task')?.value || '',
+                action: form.querySelector('#action')?.value || '',
+                result: form.querySelector('#result')?.value || ''
+            };
+            
+            // Update state
+            FeedbackForgeState.update('formData', formData);
+            FeedbackForgeState.update('formData', { simple: simpleData });
+            FeedbackForgeState.update('formData', { sbi: sbiData });
+            FeedbackForgeState.update('formData', { star: starData });
+        },
+        
+        /**
+         * Generate feedback based on current form data
+         * @returns {string} - Generated feedback script
+         */
+        generateFeedback: function() {
+            const data = FeedbackForgeState.getFormDataForGeneration();
+            
+            // Generate feedback content based on model
+            let feedbackContent = '';
+            
+            switch(data.feedbackModel) {
+                case 'sbi':
+                    feedbackContent = this.generateSBIFeedback(data);
+                    break;
+                case 'star':
+                    feedbackContent = this.generateSTARFeedback(data);
+                    break;
+                default:
+                    feedbackContent = this.generateSimpleFeedback(data);
+            }
+            
+            // If we don't have enough content, show a placeholder message
+            if (!this.hasMinimalContent(feedbackContent)) {
+                return 'Your feedback preview will appear here as you fill in the form fields...';
+            }
+            
+            // Create complete feedback script with OpenAI/closing
+            return this.generateCompleteScript(
+                data,
+                feedbackContent,
+                data.psychSafetyElements
+            );
+        },
+        
+        /**
+         * Check if there is enough content to generate a meaningful preview
+         * @param {string} content - The feedback content
+         * @returns {boolean} - Whether there is minimal content
+         */
+        hasMinimalContent: function(content) {
+            return content.trim().length > 10;
+        },
+        
+        // Use the same generation functions as in the main FeedbackGenerator
+        generateSBIFeedback: function(data) {
+            let content = '';
+            
+            if (data.situation) {
+                content += `In the recent ${data.situation}, `;
+            }
+            
+            if (data.behavior) {
+                content += `I observed that ${data.behavior}. `;
+            }
+            
+            if (data.impact) {
+                content += `This had the following impact: ${data.impact}.`;
+            }
+            
+            return content;
+        },
+        
+        generateSTARFeedback: function(data) {
+            let content = '';
+            
+            if (data.starSituation) {
+                content += `In the context of ${data.starSituation}, `;
+            }
+            
+            if (data.task) {
+                content += `where the objective was to ${data.task}, `;
+            }
+            
+            if (data.action) {
+                content += `I observed that you ${data.action}. `;
+            }
+            
+            if (data.result) {
+                content += `This resulted in ${data.result}.`;
+            }
+            
+            return content;
+        },
+        
+        generateSimpleFeedback: function(data) {
+            let content = '';
+            
+            if (data.specificStrengths) {
+                content += `I've noticed your strengths in ${data.specificStrengths}. `;
+            }
+            
+            if (data.areasForImprovement) {
+                content += `I believe we can work together on ${data.areasForImprovement}. `;
+                content += `This presents an opportunity for growth and development. `;
+            }
+            
+            if (data.supportOffered) {
+                content += `To support you with this, ${data.supportOffered}.`;
+            }
+            
+            return content;
+        },
+        
+        generateCompleteScript: function(data, contentBody, psychSafetyElements) {
+            const { 
+                recipientName, 
+                personalityType, 
+                workplaceSituation,
+                feedbackType,
+                deliveryMethod,
+                tone,
+                followUp
+            } = data;
+            
+            // Generate date in UK format (DD/MM/YYYY)
+            const today = new Date();
+            const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
+            
+            // Start the script
+            let script = `Feedback for: ${recipientName || 'Team Member'}\nDate: ${formattedDate}\n\n`;
+            
+            // Add greeting
+            script += `Dear ${recipientName || 'Team Member'},\n\n`;
+            
+            // Add opening statement based on personality type and situation
+            script += this.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
+            script += '\n\n';
+            
+            // Add main feedback content
+            script += contentBody;
+            script += '\n\n';
+            
+            // Add psychological safety elements - adapted based on feedback type
+            let psychSafetyContent = '';
+            
+            // Different approach for recognition vs other feedback types
+            if (feedbackType === 'recognition') {
+                if (psychSafetyElements.includes('separate-identity')) {
+                    psychSafetyContent += "These accomplishments reflect your dedicated approach and commitment to excellence. ";
+                }
+                
+                if (psychSafetyElements.includes('learning-opportunity')) {
+                    psychSafetyContent += "Success like this creates a foundation for continued growth and development. ";
+                }
+                
+                if (psychSafetyElements.includes('collaborative')) {
+                    psychSafetyContent += "I appreciate how we've been able to work together in this area. ";
+                }
+                
+                if (psychSafetyElements.includes('future-focused')) {
+                    psychSafetyContent += "I'm looking forward to seeing how you'll build on these strengths moving forward. ";
+                }
+            } else {
+                // For improvement, coaching, development feedback
+                if (psychSafetyElements.includes('separate-identity')) {
+                    psychSafetyContent += "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person. ";
+                }
+                
+                if (psychSafetyElements.includes('learning-opportunity')) {
+                    psychSafetyContent += "I see this as an opportunity for learning and growth. ";
+                }
+                
+                if (psychSafetyElements.includes('collaborative')) {
+                    psychSafetyContent += "I'd like us to work together on addressing these points. ";
+                }
+                
+                if (psychSafetyElements.includes('future-focused')) {
+                    psychSafetyContent += "Let's focus on how we can move forward from here. ";
+                }
+            }
+            
+            if (psychSafetyContent) {
+                script += psychSafetyContent + '\n\n';
+            }
+            
+            // Add follow-up plan if provided
+            if (followUp) {
+                script += `For follow-up, ${followUp}\n\n`;
+            }
+            
+            // Add delivery method specific text
+            if (deliveryMethod === 'written') {
+                script += "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready. ";
+            } else if (deliveryMethod === 'remote') {
+                script += "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person. ";
+            }
+            
+            if (deliveryMethod !== 'face-to-face') {
+                script += '\n\n';
+            }
+            
+            // Add closing statement based on personality type
+            script += this.getClosingStatement(personalityType, feedbackType);
+            
+            // Add formal closing
+            script += '\n\nBest regards,\n[Your Name]';
+            
+            return script;
+        },
+        
+        getOpeningStatement: function(personalityType, situation, feedbackType, tone) {
+            // Crisis situation overrides take priority
+            if (situation === 'crisis') {
+                return "I recognise we're in a challenging situation right now, but I wanted to take a moment to share some important feedback.";
+            }
+            
+            // Organisational change situation
+            if (situation === 'change') {
+                return "Despite the changes we're experiencing as an organisation, I wanted to provide some feedback that I believe will be valuable for your continued development.";
+            }
+            
+            // Personality-based openings
+            const openings = {
+                'D': {
+                    'recognition': "I want to highlight some impressive results you've achieved recently.",
+                    'improvement': "I want to share some direct feedback about where I see opportunities for even better results.",
+                    'coaching': "Let's discuss how to optimise your approach for maximum impact.",
+                    'developmental': "I've identified some specific areas where focused development could significantly improve your effectiveness."
+                },
+                'I': {
+                    'recognition': "I'm excited to share some thoughts about the positive impact you've been making!",
+                    'improvement': "I'd like to discuss some ideas about how we might collaborate to enhance certain aspects of your work.",
+                    'coaching': "I'm looking forward to exploring some development opportunities with you that could be really energising.",
+                    'developmental': "I see some exciting growth opportunities that would leverage your natural strengths even further."
+                },
+                'S': {
+                    'recognition': "I appreciate your consistent contributions and wanted to acknowledge the positive difference you've been making.",
+                    'improvement': "I'd like to share some thoughts on how we might build upon your solid foundation to enhance certain areas.",
+                    'coaching': "I'd like to offer some supportive guidance on developing certain skills that will help you continue your steady progress.",
+                    'developmental': "Building on your reliable performance, I've identified some development areas that align with your methodical approach."
+                },
+                'C': {
+                    'recognition': "Based on my analysis of your recent work, I've identified several noteworthy accomplishments to discuss.",
+                    'improvement': "After reviewing your work in detail, I've prepared some specific feedback on areas that could benefit from refinement.",
+                    'coaching': "I've analysed your current approach and identified some precise adjustments that could optimise your effectiveness.",
+                    'developmental': "Looking at the data from your recent performance, I've identified some specific development opportunities with measurable outcomes."
+                }
+            };
+            
+            // Get appropriate opening based on personality and feedback type
+            let opening = "I appreciate you taking the time to discuss this feedback.";
+            if (openings[personalityType] && openings[personalityType][feedbackType]) {
+                opening = openings[personalityType][feedbackType];
+            }
+            
+            // Tone adjustments
+            if (tone === 'direct') {
+                opening = opening
+                    .replace('I\'d like to', 'I want to')
+                    .replace('might', 'should')
+                    .replace('could', 'will');
+            }
+            
+            if (tone === 'inquiring') {
+                opening += " Would you be open to discussing this?";
+            }
+            
+            return opening;
+        },
+        
+        getClosingStatement: function(personalityType, feedbackType) {
+            const closings = {
+                'D': "What specific steps will you take next, and when can we review progress?",
+                'I': "I'm excited to see how you'll implement these ideas! Let's schedule a follow-up to discuss your creative approach.",
+                'S': "I'm here to support you through this process. What resources would be most helpful for you?",
+                'C': "Please let me know if you'd like more data or examples to help you analyse this feedback. I'm happy to provide additional detail."
+            };
+            
+            // Specialized closings for recognition feedback
+            if (feedbackType === 'recognition') {
+                const recognitionClosings = {
+                    'D': "What other goals are you now setting your sights on?",
+                    'I': "I'd love to hear your thoughts on this achievement and what you're excited about tackling next!",
+                    'S': "I hope you take a moment to appreciate your consistent contribution here. What would you like to focus on maintaining or developing next?",
+                    'C': "Your methodical approach clearly contributed to these results. I'd be interested in your analysis of the most effective aspects of your process."
+                };
+                
+                return recognitionClosings[personalityType] || "Thank you for your excellent work.";
+            }
+            
+            return closings[personalityType] || "I welcome your thoughts on this feedback.";
+        }
+    };
+
+    /**
      * DISC Module
      * Handles personality profile integration
      */
@@ -1881,6 +2369,9 @@
             UIController.init();
             FormHandler.init();
             DISCModule.init();
+            
+            // Initialize LivePreviewManager
+            LivePreviewManager.init();
             
             // Set up global access for compatibility with existing code
             this.setupGlobalAccess();
