@@ -1076,3 +1076,66 @@ legend {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===== SCROLLING FIX - START ===== */
+/* This will override all previous scrolling settings */
+
+/* Set body to have a single scrollbar */
+body {
+  overflow-y: auto !important;
+  height: auto !important;
+}
+
+/* Remove fixed heights from containers */
+main.container,
+.split-screen-container,
+.split-screen,
+.split-screen-left {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Make only specific areas scrollable */
+#form-container {
+  height: auto !important;
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  padding-right: 8px !important;
+}
+
+.split-screen-right {
+  height: auto !important;
+}
+
+.split-screen-right .card {
+  max-height: 600px !important;
+  overflow-y: auto !important;
+  padding-right: 8px !important;
+}
+
+/* Improve scrollbar appearance */
+#form-container::-webkit-scrollbar,
+.split-screen-right .card::-webkit-scrollbar {
+  width: 8px;
+}
+
+#form-container::-webkit-scrollbar-track,
+.split-screen-right .card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+#form-container::-webkit-scrollbar-thumb,
+.split-screen-right .card::-webkit-scrollbar-track {
+  background: #b0b0b0;
+  border-radius: 4px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  #form-container,
+  .split-screen-right .card {
+    max-height: 500px !important;
+  }
+}
+/* ===== SCROLLING FIX - END ===== */
