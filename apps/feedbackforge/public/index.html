@@ -54,51 +54,113 @@
                                 <h3>1. Feedback Context 
                                     <span class="info-tooltip" data-tooltip="The context of your feedback affects how it should be framed and delivered">ⓘ</span>
                                 </h3>
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="feedback-type">Feedback Type:</label>
-                                        <select id="feedback-type" name="feedbackType" required>
-                                            <option value="recognition">Recognition</option>
-                                            <option value="improvement">Improvement</option>
-                                            <option value="coaching">Coaching</option>
-                                            <option value="developmental">Developmental</option>
-                                        </select>
-                                        <div class="help-text">Choose the primary purpose of your feedback</div>
-                                        <button type="button" class="example-button" data-example="feedback-type">See examples</button>
+                                
+                                <!-- Feedback Type -->
+                                <div class="form-group">
+                                    <label>Feedback Type:</label>
+                                    <div class="option-cards" id="feedback-type-options">
+                                        <input type="radio" name="feedbackType" id="type-recognition" value="recognition" checked>
+                                        <label for="type-recognition" class="option-card">
+                                            <span class="option-title">Recognition</span>
+                                            <span class="option-description">Acknowledge achievements and positive behaviors</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="feedbackType" id="type-improvement" value="improvement">
+                                        <label for="type-improvement" class="option-card">
+                                            <span class="option-title">Improvement</span>
+                                            <span class="option-description">Address areas that need development</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="feedbackType" id="type-coaching" value="coaching">
+                                        <label for="type-coaching" class="option-card">
+                                            <span class="option-title">Coaching</span>
+                                            <span class="option-description">Guide development toward specific goals</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="feedbackType" id="type-developmental" value="developmental">
+                                        <label for="type-developmental" class="option-card">
+                                            <span class="option-title">Developmental</span>
+                                            <span class="option-description">Focus on long-term career growth</span>
+                                        </label>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="feedback-model">Feedback Model:</label>
-                                        <select id="feedback-model" name="feedbackModel" required>
-                                            <option value="simple">Simple</option>
-                                            <option value="sbi">Situation-Behavior-Impact (SBI)</option>
-                                            <option value="star">Situation-Task-Action-Result (STAR)</option>
-                                        </select>
-                                        <div class="help-text">Choose a structured approach to organize your feedback</div>
-                                        <button type="button" class="example-button" data-example="feedback-model">See examples</button>
-                                    </div>
+                                    <div class="help-text">Choose the primary purpose of your feedback</div>
+                                    <button type="button" class="example-button" data-example="feedback-type">See examples</button>
                                 </div>
                                 
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="delivery-method">Delivery Method:</label>
-                                        <select id="delivery-method" name="deliveryMethod" required>
-                                            <option value="face-to-face">Face-to-Face</option>
-                                            <option value="written">Written</option>
-                                            <option value="remote">Remote Video Call</option>
-                                        </select>
-                                        <div class="help-text">How will this feedback be delivered?</div>
+                                <!-- Feedback Model -->
+                                <div class="form-group">
+                                    <label>Feedback Model:</label>
+                                    <div class="option-cards" id="feedback-model-options">
+                                        <input type="radio" name="feedbackModel" id="model-simple" value="simple" checked>
+                                        <label for="model-simple" class="option-card">
+                                            <span class="option-title">Simple</span>
+                                            <span class="option-description">Strengths, areas for improvement, and support</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="feedbackModel" id="model-sbi" value="sbi">
+                                        <label for="model-sbi" class="option-card">
+                                            <span class="option-title">SBI</span>
+                                            <span class="option-description">Situation, Behavior, Impact</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="feedbackModel" id="model-star" value="star">
+                                        <label for="model-star" class="option-card">
+                                            <span class="option-title">STAR</span>
+                                            <span class="option-description">Situation, Task, Action, Result</span>
+                                        </label>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="workplace-situation">Workplace Situation:</label>
-                                        <select id="workplace-situation" name="workplaceSituation" required>
-                                            <option value="normal">Normal Operations</option>
-                                            <option value="crisis">Crisis/High Pressure</option>
-                                            <option value="change">Organisational Change</option>
-                                        </select>
-                                        <div class="help-text">What is the current workplace context?</div>
+                                    <div class="help-text">Choose a structured approach to organize your feedback</div>
+                                    <button type="button" class="example-button" data-example="feedback-model">See examples</button>
+                                </div>
+                                
+                                <!-- Delivery Method -->
+                                <div class="form-group">
+                                    <label>Delivery Method:</label>
+                                    <div class="option-cards" id="delivery-method-options">
+                                        <input type="radio" name="deliveryMethod" id="delivery-face" value="face-to-face" checked>
+                                        <label for="delivery-face" class="option-card">
+                                            <span class="option-title">Face-to-Face</span>
+                                            <span class="option-description">In-person conversation</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="deliveryMethod" id="delivery-written" value="written">
+                                        <label for="delivery-written" class="option-card">
+                                            <span class="option-title">Written</span>
+                                            <span class="option-description">Email or document format</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="deliveryMethod" id="delivery-remote" value="remote">
+                                        <label for="delivery-remote" class="option-card">
+                                            <span class="option-title">Remote</span>
+                                            <span class="option-description">Video call or virtual meeting</span>
+                                        </label>
                                     </div>
+                                    <div class="help-text">How will this feedback be delivered?</div>
+                                </div>
+                                
+                                <!-- Workplace Situation -->
+                                <div class="form-group">
+                                    <label>Workplace Situation:</label>
+                                    <div class="option-cards" id="workplace-situation-options">
+                                        <input type="radio" name="workplaceSituation" id="situation-normal" value="normal" checked>
+                                        <label for="situation-normal" class="option-card">
+                                            <span class="option-title">Normal Operations</span>
+                                            <span class="option-description">Typical day-to-day working environment</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="workplaceSituation" id="situation-crisis" value="crisis">
+                                        <label for="situation-crisis" class="option-card">
+                                            <span class="option-title">Crisis/High Pressure</span>
+                                            <span class="option-description">During challenging periods or emergencies</span>
+                                        </label>
+                                        
+                                        <input type="radio" name="workplaceSituation" id="situation-change" value="change">
+                                        <label for="situation-change" class="option-card">
+                                            <span class="option-title">Organisational Change</span>
+                                            <span class="option-description">During restructuring or significant transitions</span>
+                                        </label>
+                                    </div>
+                                    <div class="help-text">What is the current workplace context?</div>
                                 </div>
 
                                 <div class="form-navigation">

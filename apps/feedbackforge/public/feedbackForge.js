@@ -2366,6 +2366,121 @@
     };
 
     /**
+     * Setup and handle option card selection events
+     * This function sets up event listeners for the new radio-button based option cards
+     */
+    function setupOptionCards() {
+        // Get all radio button groups
+        const optionGroups = document.querySelectorAll('.option-cards');
+        
+        optionGroups.forEach(group => {
+            const radios = group.querySelectorAll('input[type="radio"]');
+            
+            // Add change event listener to each radio button
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    // Update form state when an option is selected
+                    const name = this.name;
+                    const value = this.value;
+                    
+                    // Update FeedbackForgeState
+                    FeedbackForgeState.setField(name, value);
+                    
+                    // Special handling for feedback model change
+                    if (name === 'feedbackModel') {
+                        FormHandler.updateModelFields(value);
+                    }
+                    
+                    // Update smart defaults if feedback type changed
+                    if (name === 'feedbackType') {
+                        FormHandler.updateSmartDefaults(value);
+                    }
+                    
+                    // Update the live preview
+                    LivePreviewManager.updatePreview();
+                });
+            });
+        });
+    }
+
+    /**
+     * Sync hidden select elements with the visible option cards
+     * This creates hidden select elements to maintain compatibility with existing code
+     */
+    function createHiddenSelectElements() {
+        // Create hidden selects for each option group
+        const optionsMap = {
+            'feedback-type-options': {
+                id: 'feedback-type',
+                name: 'feedbackType'
+            },
+            'feedback-model-options': {
+                id: 'feedback-model',
+                name: 'feedbackModel'
+            },
+            'delivery-method-options': {
+                id: 'delivery-method',
+                name: 'deliveryMethod'
+            },
+            'workplace-situation-options': {
+                id: 'workplace-situation',
+                name: 'workplaceSituation'
+            }
+        };
+        
+        // Create each hidden select element
+        for (const [groupId, config] of Object.entries(optionsMap)) {
+            const group = document.getElementById(groupId);
+            if (!group) continue;
+            
+            // Create hidden select
+            const select = document.createElement('select');
+            select.id = config.id;
+            select.name = config.name;
+            select.style.display = 'none';
+            
+            // Add options based on radio buttons
+            const radios = group.querySelectorAll('input[type="radio"]');
+            radios.forEach(radio => {
+                const option = document.createElement('option');
+                option.value = radio.value;
+                option.textContent = radio.value;
+                
+                // Set selected if radio is checked
+                if (radio.checked) {
+                    option.selected = true;
+                }
+                
+                select.appendChild(option);
+            });
+            
+            // Add hidden select to the form
+            group.appendChild(select);
+            
+            // Add synchronization between radio buttons and select
+            radios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    select.value = this.value;
+                });
+            });
+        }
+    }
+
+    /**
+     * Update the UI to reflect the current state
+     * This extends the existing updateStateFromForm function
+     */
+    function syncUIWithState() {
+        const formData = FeedbackForgeState.formData;
+        
+        // Update radio buttons to match state
+        document.querySelectorAll('.option-cards input[type="radio"]').forEach(radio => {
+            const name = radio.name;
+            radio.checked = (radio.value === formData[name]);
+        });
+    }
+
+    /**
      * Main Application
      * Initializes and coordinates all modules
      */
@@ -2384,6 +2499,13 @@
             
             // Initialize LivePreviewManager
             LivePreviewManager.init();
+            
+            // Initialize option cards
+            setupOptionCards();
+            createHiddenSelectElements();
+            
+            // Add sync function to subscribers
+            FeedbackForgeState.subscribe(syncUIWithState);
             
             // Set up global access for compatibility with existing code
             this.setupGlobalAccess();
