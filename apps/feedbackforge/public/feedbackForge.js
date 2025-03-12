@@ -1,8 +1,8 @@
 /**
- * FeedbackForge - Consolidated JavaScript with State Management
+ * FeedbackForge - Simplified JavaScript without Templates
  * 
- * This script consolidates all FeedbackForge functionality into a single, modular
- * codebase with proper state management.
+ * This script provides the core functionality for the FeedbackForge application
+ * with templates functionality removed for simplicity.
  */
 
 // Immediately-Invoked Function Expression to avoid polluting global scope
@@ -42,8 +42,7 @@
                 task: '',
                 action: '',
                 result: ''
-            },
-            templateName: ''
+            }
         },
         
         // UI state
@@ -62,9 +61,6 @@
             isEdited: false
         },
         
-        // Templates
-        templates: {},
-
         // Examples data
         examples: null,
         
@@ -72,20 +68,9 @@
         subscribers: [],
         
         /**
-         * Initialize state from localStorage and defaults
+         * Initialize state and load examples
          */
         init: function() {
-            // Load templates from localStorage
-            try {
-                const savedTemplates = localStorage.getItem('feedbackTemplates');
-                if (savedTemplates) {
-                    this.templates = JSON.parse(savedTemplates);
-                }
-            } catch (error) {
-                console.error('Error loading templates:', error);
-                this.templates = {};
-            }
-            
             // Add default listeners
             this.subscribe(UIController.update);
 
@@ -122,7 +107,7 @@
         
         /**
          * Update state and notify subscribers
-         * @param {string} key - The state key to update ('formData', 'ui', 'result', 'templates')
+         * @param {string} key - The state key to update ('formData', 'ui', 'result')
          * @param {Object} values - Key/value pairs to update
          */
         update: function(key, values) {
@@ -252,8 +237,7 @@
                     task: '',
                     action: '',
                     result: ''
-                },
-                templateName: ''
+                }
             };
             
             this.ui.validationErrors = {};
@@ -263,96 +247,6 @@
                 editedFeedbackScript: '',
                 isEdited: false
             };
-            
-            this.notify();
-        },
-        
-        /**
-         * Load form data from a template
-         * @param {string} templateName - Template name
-         */
-        loadTemplate: function(templateName) {
-            const template = this.templates[templateName];
-            if (!template) {
-                console.error(`Template '${templateName}' not found`);
-                return;
-            }
-            
-            // Reset form first
-            this.reset();
-            
-            // Apply template data
-            for (const [key, value] of Object.entries(template)) {
-                // Skip metadata
-                if (key === 'created') continue;
-                
-                // Handle special fields
-                if (key === 'psychSafetyElements') {
-                    this.formData.psychSafetyElements = Array.isArray(value) ? value : [];
-                } else if (['specificStrengths', 'areasForImprovement', 'supportOffered'].includes(key)) {
-                    this.formData.simple[key] = value;
-                } else if (['situation', 'behavior', 'impact'].includes(key)) {
-                    this.formData.sbi[key] = value;
-                } else if (['starSituation', 'task', 'action', 'result'].includes(key)) {
-                    const starKey = key === 'starSituation' ? 'situation' : key;
-                    this.formData.star[starKey] = value;
-                } else {
-                    // Handle regular fields
-                    this.formData[key] = value;
-                }
-            }
-            
-            this.notify();
-        },
-        
-        /**
-         * Save current form data as a template
-         * @param {string} templateName - Template name
-         */
-        saveTemplate: function(templateName) {
-            if (!templateName || templateName.trim() === '') {
-                console.error('Template name is required');
-                return;
-            }
-            
-            // Prepare data for storage
-            const templateData = this.getFormDataForGeneration();
-            
-            // Add metadata
-            templateData.created = new Date().toISOString();
-            
-            // Save template
-            this.templates[templateName] = templateData;
-            
-            // Save to localStorage
-            try {
-                localStorage.setItem('feedbackTemplates', JSON.stringify(this.templates));
-            } catch (error) {
-                console.error('Error saving templates:', error);
-            }
-            
-            this.notify();
-        },
-        
-        /**
-         * Delete a template
-         * @param {string} templateName - Template name
-         */
-        deleteTemplate: function(templateName) {
-            if (!this.templates[templateName]) {
-                console.error(`Template '${templateName}' not found`);
-                return;
-            }
-            
-            // Delete template
-            delete this.templates[templateName];
-            
-            // Save to localStorage
-            try {
-                localStorage.setItem('feedbackTemplates', JSON.stringify(this.templates));
-            } catch (error) {
-                console.error('Error saving templates:', error);
-            }
             
             this.notify();
         }
@@ -678,12 +572,6 @@
                     
                     // Set generate mode
                     FeedbackForgeState.update('ui', { isPreviewMode: false });
-                    
-                    // Save as template if name provided
-                    const templateName = FeedbackForgeState.formData.templateName;
-                    if (templateName && templateName.trim() !== '') {
-                        FeedbackForgeState.saveTemplate(templateName);
-                    }
                     
                     // Generate feedback
                     FeedbackGenerator.generateFeedback();
@@ -1419,7 +1307,7 @@
         init: function() {
             this.setupTabs();
             this.setupModalHandling();
-            this.setupTemplatesSystem();
+            this.setupUserFeedback();
         },
         
         /**
@@ -1473,72 +1361,6 @@
                 tab.addEventListener('click', () => {
                     const tabId = tab.dataset.tab;
                     FeedbackForgeState.update('ui', { activeTab: tabId });
-                    
-                    // Special handling for templates tab
-                    if (tabId === 'templates') {
-                        this.loadTemplates();
-                    }
-                });
-            });
-        },
-        
-        /**
-         * Load and display saved templates
-         */
-        loadTemplates: function() {
-            const templates = FeedbackForgeState.templates;
-            const container = document.getElementById('templates-container');
-            
-            if (!container) return;
-            
-            if (Object.keys(templates).length === 0) {
-                container.innerHTML = '<p class="empty-templates-message">You haven\'t saved any templates yet. Create feedback and save as a template to see them here.</p>';
-                return;
-            }
-            
-            let html = '';
-            
-            for (const [name, template] of Object.entries(templates)) {
-                const created = new Date(template.created || new Date().toISOString());
-                const formattedDate = `${created.getDate().toString().padStart(2, '0')}/${(created.getMonth() + 1).toString().padStart(2, '0')}/${created.getFullYear()}`;
-                
-                html += `
-                    <div class="template-card">
-                        <div class="template-header">
-                            <div class="template-title">${name}</div>
-                            <div class="template-date">${formattedDate}</div>
-                        </div>
-                        <div class="template-details">
-                            <span>${this.getFeedbackTypeName(template.feedbackType)}</span>
-                            <span>${this.getModelName(template.feedbackModel)}</span>
-                            <span>${this.getCommunicationStyleName(template.personalityType)}</span>
-                        </div>
-                        <div class="template-actions">
-                            <button class="primary-button apply-template" data-template="${name}">Use Template</button>
-                            <button class="secondary-button delete-template" data-template="${name}">Delete</button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            container.innerHTML = html;
-            
-            // Add event listeners
-            container.querySelectorAll('.apply-template').forEach(button => {
-                button.addEventListener('click', () => {
-                    const templateName = button.dataset.template;
-                    FeedbackForgeState.loadTemplate(templateName);
-                    FeedbackForgeState.update('ui', { activeTab: 'create', currentSection: 'context' });
-                });
-            });
-            
-            container.querySelectorAll('.delete-template').forEach(button => {
-                button.addEventListener('click', () => {
-                    const templateName = button.dataset.template;
-                    if (confirm(`Are you sure you want to delete the template "${templateName}"?`)) {
-                        FeedbackForgeState.deleteTemplate(templateName);
-                        this.loadTemplates();
-                    }
                 });
             });
         },
@@ -1554,6 +1376,35 @@
                     UIController.closeModal();
                 }
             });
+        },
+        
+        /**
+         * Set up user feedback submission
+         */
+        setupUserFeedback: function() {
+            // User feedback form
+            const submitFeedbackBtn = document.getElementById('submit-feedback');
+            if (submitFeedbackBtn) {
+                submitFeedbackBtn.addEventListener('click', function() {
+                    const feedbackText = document.getElementById('user-feedback').value.trim();
+                    if (feedbackText) {
+                        // In a real app, this would submit to a server
+                        // For now, we just show a thank you message
+                        document.getElementById('user-feedback').value = '';
+                        alert('Thank you for your feedback! We appreciate your input.');
+                        
+                        // Save feedback to localStorage for demo purposes
+                        const userFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
+                        userFeedback.push({
+                            text: feedbackText,
+                            date: new Date().toISOString()
+                        });
+                        localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
+                    } else {
+                        alert('Please enter some feedback before submitting.');
+                    }
+                });
+            }
         },
         
         /**
@@ -1605,35 +1456,6 @@
             if (modalContainer) {
                 modalContainer.classList.remove('active');
                 document.body.style.overflow = ''; // Restore scrolling
-            }
-        },
-        
-        /**
-         * Set up templates system
-         */
-        setupTemplatesSystem: function() {
-            // User feedback form
-            const submitFeedbackBtn = document.getElementById('submit-feedback');
-            if (submitFeedbackBtn) {
-                submitFeedbackBtn.addEventListener('click', function() {
-                    const feedbackText = document.getElementById('user-feedback').value.trim();
-                    if (feedbackText) {
-                        // In a real app, this would submit to a server
-                        // For now, we just show a thank you message
-                        document.getElementById('user-feedback').value = '';
-                        alert('Thank you for your feedback! We appreciate your input.');
-                        
-                        // Save feedback to localStorage for demo purposes
-                        const userFeedback = JSON.parse(localStorage.getItem('userFeedback') || '[]');
-                        userFeedback.push({
-                            text: feedbackText,
-                            date: new Date().toISOString()
-                        });
-                        localStorage.setItem('userFeedback', JSON.stringify(userFeedback));
-                    } else {
-                        alert('Please enter some feedback before submitting.');
-                    }
-                });
             }
         },
         
@@ -2035,8 +1857,6 @@
      * Handles personality profile integration
      */
     const DISCModule = {
-        // If you need to access DISC_PROFILES data, it can be initialized here
-        
         /**
          * Initialize DISC module
          */

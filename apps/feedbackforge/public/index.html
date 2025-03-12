@@ -28,7 +28,6 @@
     <main class="container">
         <div class="tabs">
             <div class="tab active" data-tab="create">Create Feedback</div>
-            <div class="tab" data-tab="templates">Templates</div>
             <div class="tab" data-tab="research">Research</div>
             <div class="tab" data-tab="about">About</div>
         </div>
@@ -272,14 +271,6 @@
                             <p>Your summary will appear here once all required fields are completed.</p>
                         </div>
 
-                        <div class="template-save">
-                            <div class="form-group">
-                                <label for="save-template">Save as Template (Optional):</label>
-                                <input type="text" id="save-template" name="templateName" placeholder="Enter a name for this template">
-                                <div class="help-text">Save these settings as a template for future use</div>
-                            </div>
-                        </div>
-
                         <div class="form-navigation">
                             <button type="button" class="secondary-button prev-button" data-prev="framing">Previous: Framing</button>
                             <div class="action-buttons">
@@ -292,16 +283,6 @@
             </div>
             
             <div id="results-container"></div>
-        </div>
-
-        <div id="templates-tab" class="tab-content">
-            <div class="card">
-                <h2>Saved Templates</h2>
-                <div id="templates-container">
-                    <p class="empty-templates-message">You haven't saved any templates yet. Create feedback and save as a template to see them here.</p>
-                    <!-- Templates will be loaded here via JS -->
-                </div>
-            </div>
         </div>
 
         <div id="research-tab" class="tab-content">
@@ -382,16 +363,12 @@
         </div>
     </div>
 
-    <!-- Tooltips are handled by CSS/JS -->
-
     <footer>
         <div class="container">
             <p>&copy; 2025 Delivering Together | <a href="/coaching/">Back to Coaching Tools</a></p>
         </div>
     </footer>
 
-    <!-- Note: examples-data.js is no longer needed as it's now integrated into feedbackForge.js -->
-	<script src="feedbackForge.js"></script>
-
+    <script src="feedbackForge.js"></script>
 </body>
 </html>
