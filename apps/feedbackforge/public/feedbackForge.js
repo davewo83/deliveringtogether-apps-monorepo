@@ -1069,50 +1069,60 @@
      * Fix scrollbar issues by managing container heights
      */
     function fixScrollbars() {
-        // Make the main container fill the viewport
-        document.body.style.overflow = 'hidden';
-        document.body.style.height = '100vh';
+        // Allow body scrolling - don't restrict it
+        document.body.style.overflow = 'auto';
+        document.body.style.height = 'auto';
         
-        // Adjust the container heights
-        const mainContent = document.querySelector('main.container');
-        if (mainContent) {
-            mainContent.style.height = 'calc(100vh - 140px)'; // Subtract header/footer height
-            mainContent.style.overflow = 'hidden';
-        }
-        
-        // Let only the form container and preview pane scroll independently
+        // Get the containers
         const formContainer = document.getElementById('form-container');
         const previewPane = document.querySelector('.split-screen-right');
+        const mainContent = document.querySelector('main.container');
         
+        // Reset any previously set styles to ensure we're starting fresh
+        if (mainContent) {
+            mainContent.style.height = '';
+            mainContent.style.overflow = '';
+        }
+        
+        // Set reasonable max-heights for the scrollable areas
         if (formContainer) {
-            formContainer.style.height = 'calc(100vh - 230px)';
+            // Remove any fixed height to allow natural scrolling
+            formContainer.style.height = '';
+            formContainer.style.maxHeight = '70vh';
             formContainer.style.overflow = 'auto';
         }
         
         if (previewPane) {
-            previewPane.style.height = 'calc(100vh - 230px)';
+            // Remove any fixed height to allow natural scrolling
+            previewPane.style.height = '';
+            previewPane.style.maxHeight = '70vh';
             previewPane.style.overflow = 'auto';
         }
         
-        // On mobile view, revert to normal scrolling behavior
-        if (window.innerWidth <= 768) {
-            document.body.style.overflow = 'auto';
-            document.body.style.height = 'auto';
-            
-            if (mainContent) {
-                mainContent.style.height = 'auto';
-                mainContent.style.overflow = 'visible';
-            }
-            
-            if (formContainer) {
-                formContainer.style.maxHeight = '70vh';
-                formContainer.style.height = 'auto';
-            }
-            
-            if (previewPane) {
-                previewPane.style.maxHeight = '70vh';
-                previewPane.style.height = 'auto';
-            }
+        // Add improved scrollbars
+        const styleElement = document.getElementById('dynamic-scrollbar-styles');
+        if (!styleElement) {
+            const style = document.createElement('style');
+            style.id = 'dynamic-scrollbar-styles';
+            style.textContent = `
+                #form-container::-webkit-scrollbar,
+                .split-screen-right::-webkit-scrollbar {
+                    width: 8px;
+                }
+                
+                #form-container::-webkit-scrollbar-track,
+                .split-screen-right::-webkit-scrollbar-track {
+                    background: #f1f1f1;
+                    border-radius: 4px;
+                }
+                
+                #form-container::-webkit-scrollbar-thumb,
+                .split-screen-right::-webkit-scrollbar-thumb {
+                    background-color: #0078d4;
+                    border-radius: 4px;
+                }
+            `;
+            document.head.appendChild(style);
         }
     }
 

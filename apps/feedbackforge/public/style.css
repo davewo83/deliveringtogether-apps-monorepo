@@ -15,9 +15,9 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* Fix scrollbar issue */
-  height: 100vh;
-  overflow: hidden;
+    /* Allow normal scrolling */
+  height: auto;
+  overflow: auto;
 }
 
 /* Layout */
@@ -40,8 +40,8 @@ body {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
-  /* Fix scrollbar issue */
-  height: 100%;
+  /* Allow natural sizing */
+  height: auto;
 }
 
 .split-screen-left {
@@ -50,19 +50,18 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  /* Fix scrollbar issue */
-  height: 100%;
-  overflow: hidden;
+  /* Allow natural sizing */
+  height: auto;
+  overflow: visible;
 }
 
 .split-screen-right {
   flex: 1;
   min-width: 0;
-  position: sticky;
-  top: 120px;
-  /* Fix scrollbar issue - remove max-height constraint */
-  height: 100%;
-  overflow: hidden;
+  position: relative;
+  /* Allow natural scrolling */
+  max-height: 70vh;
+  overflow-y: auto;
 }
 
 /* Preview card specific styles */
@@ -127,9 +126,9 @@ main.container {
   flex: 1;
   padding-top: 2rem;
   padding-bottom: 2rem;
-  /* Fix scrollbar issue */
-  height: calc(100vh - 140px);
-  overflow: hidden;
+  /* Allow natural sizing */
+  height: auto;
+  overflow: visible;
 }
 
 /* Tabs */
@@ -725,8 +724,9 @@ legend {
 
 /* Ensure form container is properly scrollable */
 #form-container {
-    /* Fix scrollbar issue - improved setting */
-    height: calc(100% - 80px);
+    /* Allow natural scrolling with a maximum height */
+    max-height: 70vh;
+    height: auto;
     overflow-y: auto;
     position: relative;
     scrollbar-width: thin;
@@ -734,11 +734,7 @@ legend {
 }
 
 /* Fixed scrollable right panel */
-.split-screen-right {
-    height: calc(100% - 80px);
-    overflow-y: auto;
-    position: relative;
-}
+/* This is now handled by the main split-screen-right style definition */
 
 /* Custom scrollbar styling for better visibility */
 #form-container::-webkit-scrollbar,
@@ -771,27 +767,15 @@ legend {
         font-size: 0.8rem;
     }
     
-    /* Adjust for mobile view */
+    /* Adjust for mobile view - shorter containers */
     #form-container,
     .split-screen-right {
-        max-height: 70vh;
-        height: auto;
+        max-height: 60vh;
     }
     
     /* More prominent fade on mobile */
     .split-screen-left.has-overflow::after {
         height: 100px;
-    }
-    
-    body {
-        overflow: auto;
-        height: auto;
-    }
-    
-    main.container,
-    .split-screen-container {
-        height: auto;
-        overflow: visible;
     }
 }
 
