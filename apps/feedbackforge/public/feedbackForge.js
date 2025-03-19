@@ -1066,64 +1066,135 @@
     };
 
     /**
-     * Fix scrollbar issues by managing container heights
+     * UPDATED: Fix scrollbar issues by managing container heights
+     * This function has been completely rewritten to provide a more robust solution
      */
     function fixScrollbars() {
-        // Allow body scrolling - don't restrict it
+        // Configuration
+        const config = {
+            formContainerId: 'form-container',
+            previewContainerId: 'live-preview',
+            formContainerMaxHeight: '70vh',
+            previewContainerMaxHeight: '70vh',
+            mobileBreakpoint: 768
+        };
+        
+        // Allow body and main containers to size naturally without scrollbars
         document.body.style.overflow = 'auto';
         document.body.style.height = 'auto';
         
-        // Get the containers
-        const formContainer = document.getElementById('form-container');
+        const mainContainer = document.querySelector('main.container');
+        if (mainContainer) {
+            mainContainer.style.height = 'auto';
+            mainContainer.style.overflow = 'visible';
+        }
+        
+        // Get key containers
+        const formContainer = document.getElementById(config.formContainerId);
         const previewPane = document.querySelector('.split-screen-right');
-        const mainContent = document.querySelector('main.container');
+        const previewCard = previewPane?.querySelector('.card');
+        const previewContent = document.getElementById(config.previewContainerId);
         
-        // Reset any previously set styles to ensure we're starting fresh
-        if (mainContent) {
-            mainContent.style.height = '';
-            mainContent.style.overflow = '';
+        // Remove fixed heights from split containers
+        const splitContainer = document.querySelector('.split-screen-container');
+        if (splitContainer) {
+            splitContainer.style.height = 'auto';
+            splitContainer.style.overflow = 'visible';
         }
         
-        // Set reasonable max-heights for the scrollable areas
+        const splitScreen = document.querySelector('.split-screen');
+        if (splitScreen) {
+            splitScreen.style.height = 'auto';
+            splitScreen.style.overflow = 'visible';
+        }
+        
+        const leftPanel = document.querySelector('.split-screen-left');
+        if (leftPanel) {
+            leftPanel.style.height = 'auto';
+            leftPanel.style.overflow = 'visible';
+        }
+        
+        // Set up form container scrolling
         if (formContainer) {
-            // Remove any fixed height to allow natural scrolling
-            formContainer.style.height = '';
-            formContainer.style.maxHeight = '70vh';
-            formContainer.style.overflow = 'auto';
+            formContainer.style.height = 'auto';
+            formContainer.style.maxHeight = isMobileView() ? '60vh' : config.formContainerMaxHeight;
+            formContainer.style.overflowY = 'auto';
+            formContainer.style.overflowX = 'hidden';
+            formContainer.style.paddingRight = '8px';
         }
         
+        // Set up preview container scrolling
         if (previewPane) {
-            // Remove any fixed height to allow natural scrolling
-            previewPane.style.height = '';
-            previewPane.style.maxHeight = '70vh';
-            previewPane.style.overflow = 'auto';
+            previewPane.style.height = 'auto';
+            previewPane.style.overflow = 'visible';
+            
+            if (previewCard) {
+                previewCard.style.maxHeight = isMobileView() ? '60vh' : config.previewContainerMaxHeight;
+                previewCard.style.overflowY = 'auto';
+                previewCard.style.paddingRight = '8px';
+            }
+            
+            if (previewContent) {
+                previewContent.style.height = 'auto';
+                previewContent.style.maxHeight = 'none';
+            }
         }
         
-        // Add improved scrollbars
-        const styleElement = document.getElementById('dynamic-scrollbar-styles');
-        if (!styleElement) {
+        // Ensure custom scrollbar styling is applied
+        ensureScrollbarStyling();
+    }
+    
+    /**
+     * Ensures custom scrollbar styling is applied
+     */
+    function ensureScrollbarStyling() {
+        const styleId = 'custom-scrollbar-styles';
+        
+        // Check if our scrollbar styles are already added
+        if (!document.getElementById(styleId)) {
             const style = document.createElement('style');
-            style.id = 'dynamic-scrollbar-styles';
+            style.id = styleId;
             style.textContent = `
+                /* Custom scrollbar styling */
                 #form-container::-webkit-scrollbar,
-                .split-screen-right::-webkit-scrollbar {
+                .split-screen-right .card::-webkit-scrollbar {
                     width: 8px;
                 }
                 
                 #form-container::-webkit-scrollbar-track,
-                .split-screen-right::-webkit-scrollbar-track {
+                .split-screen-right .card::-webkit-scrollbar-track {
                     background: #f1f1f1;
                     border-radius: 4px;
                 }
                 
                 #form-container::-webkit-scrollbar-thumb,
-                .split-screen-right::-webkit-scrollbar-thumb {
+                .split-screen-right .card::-webkit-scrollbar-thumb {
                     background-color: #0078d4;
                     border-radius: 4px;
+                }
+                
+                #form-container::-webkit-scrollbar-thumb:hover,
+                .split-screen-right .card::-webkit-scrollbar-thumb:hover {
+                    background-color: #005a9e;
+                }
+                
+                /* Firefox scrollbar styling */
+                #form-container,
+                .split-screen-right .card {
+                    scrollbar-width: thin;
+                    scrollbar-color: #0078d4 #f1f1f1;
                 }
             `;
             document.head.appendChild(style);
         }
+    }
+    
+    /**
+     * Checks if current view is mobile view
+     * @returns {boolean} Is mobile view
+     */
+    function isMobileView() {
+        return window.innerWidth < 768;
     }
 
     /**
@@ -1156,7 +1227,23 @@
 
             // Initialize scroll fix
             fixScrollbars();
-            window.addEventListener('resize', fixScrollbars);
+            window.addEventListener('resize', debounce(fixScrollbars, 250));
+            
+            // Listen for tab changes
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Short delay to allow DOM updates
+                    setTimeout(fixScrollbars, 100);
+                });
+            });
+            
+            // Listen for section changes
+            document.querySelectorAll('.next-button, .prev-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    // Short delay to allow DOM updates
+                    setTimeout(fixScrollbars, 100);
+                });
+            });
             
             console.log('FeedbackForge initialized successfully');
         },
@@ -1190,6 +1277,22 @@
             window.FeedbackForgeState = FeedbackForgeState;
         }
     };
+
+    /**
+     * Debounce function utility
+     * @param {Function} func - Function to debounce
+     * @param {number} wait - Delay in milliseconds
+     * @returns {Function} - Debounced function
+     */
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    }
 
     // Initialize the application when the DOM is fully loaded
     document.addEventListener('DOMContentLoaded', function() {
