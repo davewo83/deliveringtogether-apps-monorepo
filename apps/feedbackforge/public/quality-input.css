@@ -1,4 +1,4 @@
-/* Quality Input Styles */
+/* Quality Input Features Styles */
 
 /* Progressive disclosure field styles */
 .hidden-field {
@@ -109,7 +109,6 @@
     margin-right: 8px;
     margin-top: 2px;
     color: #005a9e;
-    transform: scale(0.8);
 }
 
 /* View example button */
@@ -157,10 +156,9 @@
     }
 }
 
-/* Style quality indicators by quality level */
+/* Quality level colors */
 .quality-level-empty .quality-bar {
     background-color: #9e9e9e;
-    width: 0;
 }
 
 .quality-level-poor .quality-bar {
