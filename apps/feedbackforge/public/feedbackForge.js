@@ -16,15 +16,15 @@
     const FeedbackForgeState = {
         // Form data
         formData: {
-            feedbackType: 'recognition',
-            feedbackModel: 'simple',
-            deliveryMethod: 'face-to-face',
-            workplaceSituation: 'normal',
-            recipientName: '',
-            recipientRole: '',
-            personalityType: 'D',
-            tone: 'supportive',
-            psychSafetyElements: ['separate-identity', 'learning-opportunity'],
+            feedbackType: '',
+            feedbackModel: '',
+            deliveryMethod: '',
+            workplaceSituation: '',
+            recipientName: '[name]',
+            recipientRole: '[role]',
+            personalityType: '',
+            tone: '',
+            psychSafetyElements: [],
             followUp: '',
             // Model-specific fields - each model has its own data object
             simple: {
@@ -217,15 +217,15 @@
          */
         reset: function() {
             this.formData = {
-                feedbackType: 'recognition',
-                feedbackModel: 'simple',
-                deliveryMethod: 'face-to-face',
-                workplaceSituation: 'normal',
-                recipientName: '',
-                recipientRole: '',
-                personalityType: 'D',
-                tone: 'supportive',
-                psychSafetyElements: ['separate-identity', 'learning-opportunity'],
+                feedbackType: '',
+                feedbackModel: '',
+                deliveryMethod: '',
+                workplaceSituation: '',
+                recipientName: '[name]',
+                recipientRole: '[role]',
+                personalityType: '',
+                tone: '',
+                psychSafetyElements: [],
                 followUp: '',
                 simple: {
                     specificStrengths: '',
@@ -284,18 +284,6 @@
             // Update context section now that it includes recipient information
             const contextSection = document.getElementById('context-section');
             if (contextSection) {
-                // Set recipient name value from state if available
-                const nameField = contextSection.querySelector('#recipient-name');
-                if (nameField && FeedbackForgeState.formData.recipientName) {
-                    nameField.value = FeedbackForgeState.formData.recipientName;
-                }
-                
-                // Set recipient role value from state if available
-                const roleField = contextSection.querySelector('#recipient-role');
-                if (roleField && FeedbackForgeState.formData.recipientRole) {
-                    roleField.value = FeedbackForgeState.formData.recipientRole;
-                }
-                
                 // Set personality type value from state if available
                 const personalityField = contextSection.querySelector('#personality-type');
                 if (personalityField && FeedbackForgeState.formData.personalityType) {
@@ -449,6 +437,8 @@
          * @param {string} feedbackType - Selected feedback type
          */
         updateSmartDefaults: function(feedbackType) {
+            if (!feedbackType) return;
+            
             // Set recommended model based on feedback type
             let recommendedModel = 'simple';
             
@@ -460,13 +450,17 @@
             
             // Update model if it's not already set
             const currentModel = FeedbackForgeState.formData.feedbackModel;
-            if (currentModel !== recommendedModel) {
+            if (!currentModel) {
                 FeedbackForgeState.update('formData', { feedbackModel: recommendedModel });
                 this.updateModelFields(recommendedModel);
                 
                 // Update UI elements
                 const modelSelect = document.getElementById('feedback-model');
                 if (modelSelect) modelSelect.value = recommendedModel;
+                
+                // Trigger a change event to update the UI
+                const event = new Event('change');
+                modelSelect.dispatchEvent(event);
             }
             
             // Update psychological safety recommendations
@@ -477,6 +471,11 @@
             
             // Highlight recommended fields based on feedback type
             this.updateRecommendedFields(feedbackType);
+            
+            // Trigger UI controller to add placeholder content based on selections
+            if (typeof UIController.addFeedbackTypePlaceholderContent === 'function') {
+                UIController.addFeedbackTypePlaceholderContent(feedbackType);
+            }
         },
         
         /**
@@ -889,6 +888,7 @@
         generateCompleteScript: function(data, contentBody, psychSafetyElements) {
             const { 
                 recipientName, 
+                recipientRole,
                 personalityType, 
                 workplaceSituation,
                 feedbackType,
@@ -901,11 +901,11 @@
             const today = new Date();
             const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
             
-            // Start the script
-            let script = `${StringService.getString('ui.labels.feedbackFor')} ${recipientName || 'Team Member'}\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
+            // Start the script using [name] placeholder
+            let script = `${StringService.getString('ui.labels.feedbackFor')} ${recipientName}\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
             
             // Add greeting
-            script += `${StringService.getString('ui.labels.greeting')} ${recipientName || 'Team Member'},\n\n`;
+            script += `${StringService.getString('ui.labels.greeting')} ${recipientName},\n\n`;
             
             // Add opening statement based on personality type and situation
             script += this.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);

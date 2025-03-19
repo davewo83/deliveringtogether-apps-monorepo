@@ -121,9 +121,8 @@ const LivePreviewManager = (function() {
         document.getElementById('download-feedback')?.addEventListener('click', () => {
             if (!previewElement) return;
             
-            const recipientName = document.getElementById('recipient-name')?.value || 'team-member';
             const dateStr = new Date().toISOString().slice(0,10);
-            const filename = `feedback-for-${recipientName}-${dateStr}.txt`.toLowerCase().replace(/\s+/g, '-');
+            const filename = `feedback-${dateStr}.txt`.toLowerCase().replace(/\s+/g, '-');
             
             const blob = new Blob([previewElement.textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
@@ -173,14 +172,14 @@ const LivePreviewManager = (function() {
         
         // Update basic fields
         const formData = {
-            feedbackType: form.querySelector('#feedback-type')?.value || 'recognition',
-            feedbackModel: form.querySelector('#feedback-model')?.value || 'simple',
-            deliveryMethod: form.querySelector('#delivery-method')?.value || 'face-to-face',
-            workplaceSituation: form.querySelector('#workplace-situation')?.value || 'normal',
-            recipientName: form.querySelector('#recipient-name')?.value || '',
-            recipientRole: form.querySelector('#recipient-role')?.value || '',
-            personalityType: form.querySelector('#personality-type')?.value || 'D',
-            tone: form.querySelector('#tone')?.value || 'supportive',
+            feedbackType: form.querySelector('input[name="feedbackType"]:checked')?.value || '',
+            feedbackModel: form.querySelector('input[name="feedbackModel"]:checked')?.value || '',
+            deliveryMethod: form.querySelector('input[name="deliveryMethod"]:checked')?.value || '',
+            workplaceSituation: form.querySelector('input[name="workplaceSituation"]:checked')?.value || '',
+            recipientName: '[name]', // Use placeholder instead of form input
+            recipientRole: '[role]', // Use placeholder instead of form input
+            personalityType: form.querySelector('#personality-type')?.value || '',
+            tone: form.querySelector('#tone')?.value || '',
             followUp: form.querySelector('#follow-up')?.value || ''
         };
         
@@ -258,6 +257,12 @@ const LivePreviewManager = (function() {
      * @returns {boolean} - Whether there is minimal content
      */
     function hasMinimalContent(content) {
+        // Always show content when we have selection
+        if (FeedbackForgeState.formData.feedbackType && FeedbackForgeState.formData.feedbackModel) {
+            return true;
+        }
+        
+        // Otherwise check for sufficient content length
         return content.trim().length > 10;
     }
     
@@ -349,7 +354,6 @@ const LivePreviewManager = (function() {
      */
     function generateCompleteScript(data, contentBody, psychSafetyElements) {
         const { 
-            recipientName, 
             personalityType, 
             workplaceSituation,
             feedbackType,
@@ -362,11 +366,11 @@ const LivePreviewManager = (function() {
         const today = new Date();
         const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
         
-        // Start the script
-        let script = `${StringService.getString('ui.labels.feedbackFor')} ${recipientName || 'Team Member'}\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
+        // Start the script - use placeholders for name
+        let script = `${StringService.getString('ui.labels.feedbackFor')} [name]\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
         
         // Add greeting
-        script += `${StringService.getString('ui.labels.greeting')} ${recipientName || 'Team Member'},\n\n`;
+        script += `${StringService.getString('ui.labels.greeting')} [name],\n\n`;
         
         // Add opening statement - use FeedbackGenerator for consistency
         script += FeedbackGenerator.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);

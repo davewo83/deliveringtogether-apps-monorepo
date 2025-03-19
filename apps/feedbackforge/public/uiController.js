@@ -400,7 +400,7 @@ const UIController = (function() {
     function generateFormSummary() {
         const data = FeedbackForgeState.formData;
         
-        // Create summary HTML - updated for three sections
+        // Create summary HTML - updated for three sections without recipient name/role
         let summaryHtml = `
             <div class="summary-section">
                 <h4>Feedback Setup</h4>
@@ -419,10 +419,6 @@ const UIController = (function() {
                 <div class="summary-row">
                     <div class="summary-label">Workplace Situation:</div>
                     <div class="summary-value">${getSituationName(data.workplaceSituation)}</div>
-                </div>
-                <div class="summary-row">
-                    <div class="summary-label">Recipient:</div>
-                    <div class="summary-value">${data.recipientName} (${data.recipientRole || 'No role specified'})</div>
                 </div>
                 <div class="summary-row">
                     <div class="summary-label">Communication Style:</div>
@@ -555,7 +551,9 @@ const UIController = (function() {
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = `feedback-for-${FeedbackForgeState.formData.recipientName || 'team-member'}-${new Date().toISOString().slice(0,10)}.txt`.toLowerCase().replace(/\s+/g, '-');
+                // Use default filename without recipient name
+                const dateStr = new Date().toISOString().slice(0,10);
+                a.download = `feedback-${dateStr}.txt`.toLowerCase().replace(/\s+/g, '-');
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -668,15 +666,28 @@ const UIController = (function() {
                     // Special handling for feedback model change
                     if (name === 'feedbackModel') {
                         FormHandler.updateModelFields(value);
+                        
+                        // Add default placeholder content for the selected model
+                        addModelPlaceholderContent(value);
                     }
                     
                     // Update smart defaults if feedback type changed
                     if (name === 'feedbackType') {
                         FormHandler.updateSmartDefaults(value);
+                        
+                        // Add default content for the selected feedback type
+                        addFeedbackTypePlaceholderContent(value);
                     }
                     
-                    // Update the live preview
-                    LivePreviewManager.updatePreview();
+                    // Add placeholder content for other selection types
+                    if (name === 'personalityType') {
+                        addPersonalityTypePlaceholderContent(value);
+                    }
+                    
+                    if (name === 'deliveryMethod' || name === 'workplaceSituation') {
+                        // Update the live preview for other selections too
+                        LivePreviewManager.updatePreview();
+                    }
                 });
             });
             
@@ -687,6 +698,215 @@ const UIController = (function() {
                 });
             });
         });
+    }
+    
+    /**
+     * Add placeholder content for the selected model
+     * @param {string} model - Selected feedback model
+     */
+    function addModelPlaceholderContent(model) {
+        if (!model) return;
+        
+        // Add placeholder content based on model
+        switch(model) {
+            case 'simple':
+                if (!FeedbackForgeState.formData.simple.specificStrengths) {
+                    FeedbackForgeState.update('formData', { 
+                        simple: {
+                            specificStrengths: 'your clear communication and attention to detail',
+                            areasForImprovement: 'planning project timelines with more buffer for unexpected challenges',
+                            supportOffered: 'I can share some effective project planning templates and check in weekly on progress'
+                        }
+                    });
+                }
+                break;
+                
+            case 'sbi':
+                if (!FeedbackForgeState.formData.sbi.situation) {
+                    FeedbackForgeState.update('formData', { 
+                        sbi: {
+                            situation: 'the quarterly planning meeting last Thursday',
+                            behavior: 'you presented comprehensive data analysis and asked clarifying questions before making recommendations',
+                            impact: 'the team was able to make a well-informed decision quickly, saving us valuable planning time'
+                        }
+                    });
+                }
+                break;
+                
+            case 'star':
+                if (!FeedbackForgeState.formData.star.situation) {
+                    FeedbackForgeState.update('formData', { 
+                        star: {
+                            situation: 'the recent system outage',
+                            task: 'restore service quickly while identifying the root cause',
+                            action: 'you coordinated the response team efficiently, delegated tasks appropriately, and maintained clear communication',
+                            result: 'service was restored 30% faster than our target time and we identified a previously unknown vulnerability'
+                        }
+                    });
+                }
+                break;
+        }
+        
+        // Update the live preview
+        LivePreviewManager.updatePreview();
+    }
+    
+    /**
+     * Add placeholder content for the selected feedback type
+     * @param {string} feedbackType - Selected feedback type
+     */
+    function addFeedbackTypePlaceholderContent(feedbackType) {
+        if (!feedbackType) return;
+        
+        // Don't override existing content
+        const model = FeedbackForgeState.formData.feedbackModel;
+        if (!model) return; // Need a model selected first
+        
+        // Add appropriate placeholder content
+        switch(model) {
+            case 'simple':
+                // Adjust simple model content based on feedback type
+                if (feedbackType === 'recognition') {
+                    FeedbackForgeState.update('formData', { 
+                        simple: {
+                            specificStrengths: 'your exceptional presentation to the client and ability to answer complex questions clearly',
+                            areasForImprovement: '',
+                            supportOffered: 'I would like to have you share these presenting techniques with the wider team'
+                        }
+                    });
+                } else if (feedbackType === 'improvement') {
+                    FeedbackForgeState.update('formData', { 
+                        simple: {
+                            specificStrengths: 'your strong technical knowledge and attention to detail',
+                            areasForImprovement: 'documentation of your work so others can build upon it effectively',
+                            supportOffered: 'I can share some documentation templates and review your first drafts'
+                        }
+                    });
+                } else if (feedbackType === 'coaching') {
+                    FeedbackForgeState.update('formData', { 
+                        simple: {
+                            specificStrengths: 'your analytical problem-solving approach',
+                            areasForImprovement: 'communicating technical concepts to non-technical stakeholders',
+                            supportOffered: 'we can arrange for you to attend the communication workshop next month and practice with mock scenarios'
+                        }
+                    });
+                }
+                break;
+                
+            case 'sbi':
+                // Adjust SBI model content based on feedback type
+                if (feedbackType === 'recognition') {
+                    FeedbackForgeState.update('formData', { 
+                        sbi: {
+                            situation: 'the client presentation yesterday',
+                            behavior: 'you thoroughly researched the client's industry challenges and tailored your presentation to address their specific needs',
+                            impact: 'the client commented on how well we understood their business and immediately approved the proposed solution'
+                        }
+                    });
+                } else if (feedbackType === 'improvement') {
+                    FeedbackForgeState.update('formData', { 
+                        sbi: {
+                            situation: 'our team meeting yesterday',
+                            behavior: 'you arrived 15 minutes late without notifying the team in advance',
+                            impact: 'we had to delay starting the key agenda items and some team members had to leave before we finished'
+                        }
+                    });
+                } else if (feedbackType === 'coaching') {
+                    FeedbackForgeState.update('formData', { 
+                        sbi: {
+                            situation: 'when presenting technical updates to non-technical stakeholders',
+                            behavior: 'you tend to use specialized terminology without providing context or explanations',
+                            impact: 'stakeholders sometimes appear confused and hesitate to ask questions, potentially missing important information'
+                        }
+                    });
+                }
+                break;
+                
+            case 'star':
+                // Adjust STAR model content based on feedback type
+                if (feedbackType === 'recognition') {
+                    FeedbackForgeState.update('formData', { 
+                        star: {
+                            situation: 'the system outage last week',
+                            task: 'identify the root cause and restore service as quickly as possible',
+                            action: 'you led the troubleshooting process, coordinated the team effectively, and maintained clear communication throughout',
+                            result: 'we restored service in half the expected time and identified a vulnerability that could have caused future issues'
+                        }
+                    });
+                } else if (feedbackType === 'improvement') {
+                    FeedbackForgeState.update('formData', { 
+                        star: {
+                            situation: 'the recent product launch preparation',
+                            task: 'prepare detailed documentation for the support team',
+                            action: 'you submitted the documentation two days after the deadline without communicating about the delay',
+                            result: 'the support team had limited time to review the materials, leading to some confusion during the initial customer inquiries'
+                        }
+                    });
+                } else if (feedbackType === 'coaching') {
+                    FeedbackForgeState.update('formData', { 
+                        star: {
+                            situation: 'complex client projects requiring cross-team collaboration',
+                            task: 'coordinate effectively with multiple departments to deliver integrated solutions',
+                            action: 'you tend to focus on your team's deliverables without proactively checking alignment with other teams',
+                            result: 'we sometimes discover misalignments late in the process, requiring rework and creating timeline pressure'
+                        }
+                    });
+                }
+                break;
+        }
+        
+        // Update tone based on feedback type
+        if (feedbackType === 'recognition') {
+            FeedbackForgeState.update('formData', { tone: 'supportive' });
+        } else if (feedbackType === 'improvement') {
+            FeedbackForgeState.update('formData', { tone: 'direct' });
+        } else if (feedbackType === 'coaching') {
+            FeedbackForgeState.update('formData', { tone: 'coaching' });
+        }
+        
+        // Update the live preview
+        LivePreviewManager.updatePreview();
+    }
+    
+    /**
+     * Add placeholder content adjusted for the selected personality type
+     * @param {string} personalityType - Selected DISC personality type
+     */
+    function addPersonalityTypePlaceholderContent(personalityType) {
+        if (!personalityType) return;
+        
+        // Update psychological safety elements based on personality type
+        let elements = [];
+        
+        switch(personalityType) {
+            case 'D':
+                // Direct types appreciate focus on results and efficiency
+                elements = ['separate-identity', 'future-focused'];
+                break;
+            case 'I':
+                // Interactive types value enthusiasm and collaboration
+                elements = ['collaborative', 'learning-opportunity'];
+                break;
+            case 'S':
+                // Supportive types appreciate steady, methodical approaches
+                elements = ['learning-opportunity', 'separate-identity'];
+                break;
+            case 'C':
+                // Analytical types value accuracy and detailed information
+                elements = ['separate-identity', 'future-focused'];
+                break;
+        }
+        
+        // Update state
+        FeedbackForgeState.update('formData', { psychSafetyElements: elements });
+        
+        // Update checkboxes in the UI
+        document.querySelectorAll('input[name="psychSafetyElements"]').forEach(checkbox => {
+            checkbox.checked = elements.includes(checkbox.value);
+        });
+        
+        // Update the live preview
+        LivePreviewManager.updatePreview();
     }
     
     // ===== SHRINKING CARDS FUNCTIONALITY =====
@@ -1003,10 +1223,10 @@ const UIController = (function() {
         const contextSummary = document.querySelector('[data-section="context"] .section-summary');
         if (contextSummary && formData.feedbackType) {
             const typeName = getFeedbackTypeName(formData.feedbackType);
-            const recipientInfo = formData.recipientName ? 
-                ` for ${formData.recipientName}` : '';
+            const styleInfo = formData.personalityType ? 
+                ` (${getCommunicationStyleName(formData.personalityType)})` : '';
             
-            contextSummary.textContent = `${typeName}${recipientInfo}`;
+            contextSummary.textContent = `${typeName}${styleInfo}`;
         }
         
         // Content section summary
@@ -1175,6 +1395,11 @@ const UIController = (function() {
         updateProgressIndicator,
         setupOptionCards,
         setupFormNavigation,
+        
+        // New methods for auto-preview functionality
+        addModelPlaceholderContent,
+        addFeedbackTypePlaceholderContent,
+        addPersonalityTypePlaceholderContent,
         
         // Shrinking cards API
         initShrinkingCards,
