@@ -42,8 +42,28 @@ const LivePreviewManager = (function() {
         // Set up copy and download buttons
         setupControls();
         
-        // Initial preview generation
-        updatePreview();
+        // Check if FeedbackForgeState is available
+        if (typeof window.FeedbackForgeState === 'undefined' || !window.FeedbackForgeState) {
+            console.warn('FeedbackForgeState not available yet, waiting before initializing preview');
+            
+            // Set a temporary message
+            if (previewElement) {
+                previewElement.innerHTML = 'Preview will be available once the form is ready...';
+            }
+            
+            // Try again after a short delay
+            setTimeout(() => {
+                if (typeof window.FeedbackForgeState !== 'undefined' && window.FeedbackForgeState) {
+                    console.log('FeedbackForgeState now available, updating preview');
+                    updatePreview();
+                } else {
+                    console.warn('FeedbackForgeState still not available after delay');
+                }
+            }, 300);
+        } else {
+            // Initial preview generation
+            updatePreview();
+        }
     }
     
     /**
@@ -51,6 +71,10 @@ const LivePreviewManager = (function() {
      */
     function setupEventListeners() {
         const form = document.getElementById('feedback-form');
+        if (!form) {
+            console.warn('Feedback form not found, event listeners not set up');
+            return;
+        }
         
         // Listen to all input events on the form
         form.addEventListener('input', handleFormInput);
@@ -85,13 +109,30 @@ const LivePreviewManager = (function() {
         // Update preview immediately for select changes
         updatePreview();
         
+        // Check if required elements exist
+        if (!previewModelElement || !previewStyleElement || !previewToneElement) {
+            return;
+        }
+        
         // Update the model info display
         if (event.target.id === 'feedback-model') {
-            previewModelElement.textContent = UIController.getModelName(event.target.value);
+            if (typeof UIController !== 'undefined' && UIController) {
+                previewModelElement.textContent = UIController.getModelName(event.target.value);
+            } else {
+                previewModelElement.textContent = event.target.value;
+            }
         } else if (event.target.id === 'personality-type') {
-            previewStyleElement.textContent = UIController.getCommunicationStyleName(event.target.value);
+            if (typeof UIController !== 'undefined' && UIController) {
+                previewStyleElement.textContent = UIController.getCommunicationStyleName(event.target.value);
+            } else {
+                previewStyleElement.textContent = event.target.value;
+            }
         } else if (event.target.id === 'tone') {
-            previewToneElement.textContent = UIController.getToneName(event.target.value);
+            if (typeof UIController !== 'undefined' && UIController) {
+                previewToneElement.textContent = UIController.getToneName(event.target.value);
+            } else {
+                previewToneElement.textContent = event.target.value;
+            }
         }
     }
     
@@ -107,7 +148,13 @@ const LivePreviewManager = (function() {
                 .then(() => {
                     const button = document.getElementById('copy-feedback');
                     const originalText = button.textContent;
-                    button.textContent = StringService.getString('ui.buttons.copied');
+                    
+                    if (typeof StringService !== 'undefined' && StringService) {
+                        button.textContent = StringService.getString('ui.buttons.copied');
+                    } else {
+                        button.textContent = 'Copied!';
+                    }
+                    
                     setTimeout(() => {
                         button.textContent = originalText;
                     }, 2000);
@@ -147,26 +194,44 @@ const LivePreviewManager = (function() {
             return;
         }
         
-        // Update form data in state
-        updateStateFromForm();
+        // Check if FeedbackForgeState is available
+        if (typeof window.FeedbackForgeState === 'undefined' || !window.FeedbackForgeState) {
+            console.warn('FeedbackForgeState not available yet, skipping preview update');
+            previewElement.innerHTML = 'Preview will be available once the form is ready...';
+            return;
+        }
         
-        // Generate feedback based on current state
-        const feedbackScript = generateFeedback();
-        
-        // Apply highlight effect to show changes
-        previewElement.classList.add('highlight-update');
-        setTimeout(() => {
-            previewElement.classList.remove('highlight-update');
-        }, 1000);
-        
-        // Update the preview content
-        previewElement.innerHTML = feedbackScript.replace(/\n/g, '<br>');
+        try {
+            // Update form data in state
+            updateStateFromForm();
+            
+            // Generate feedback based on current state
+            const feedbackScript = generateFeedback();
+            
+            // Apply highlight effect to show changes
+            previewElement.classList.add('highlight-update');
+            setTimeout(() => {
+                previewElement.classList.remove('highlight-update');
+            }, 1000);
+            
+            // Update the preview content
+            previewElement.innerHTML = feedbackScript.replace(/\n/g, '<br>');
+        } catch (error) {
+            console.error('Error updating preview:', error);
+            previewElement.innerHTML = 'An error occurred while updating the preview. Please try again.';
+        }
     }
     
     /**
      * Update FeedbackForgeState with current form values
      */
     function updateStateFromForm() {
+        // Check if FeedbackForgeState is available
+        if (typeof window.FeedbackForgeState === 'undefined' || !window.FeedbackForgeState) {
+            console.warn('FeedbackForgeState not available yet, skipping state update');
+            return;
+        }
+        
         const form = document.getElementById('feedback-form');
         if (!form) return;
         
@@ -222,6 +287,11 @@ const LivePreviewManager = (function() {
      * @returns {string} - Generated feedback script
      */
     function generateFeedback() {
+        // Check if FeedbackForgeState is available
+        if (typeof window.FeedbackForgeState === 'undefined' || !window.FeedbackForgeState) {
+            return "Preview will be available once the form is ready...";
+        }
+        
         const data = FeedbackForgeState.getFormDataForGeneration();
         
         // Generate feedback content based on model
@@ -240,15 +310,25 @@ const LivePreviewManager = (function() {
         
         // If we don't have enough content, show a placeholder message
         if (!hasMinimalContent(feedbackContent)) {
-            return StringService.getString('ui.placeholders.preview');
+            // Use StringService if available, otherwise use a default message
+            if (typeof StringService !== 'undefined' && StringService) {
+                return StringService.getString('ui.placeholders.preview');
+            } else {
+                return "Your feedback preview will appear here as you fill out the form fields...";
+            }
         }
         
         // Create complete feedback script with OpenAI/closing
-        return generateCompleteScript(
-            data,
-            feedbackContent,
-            data.psychSafetyElements
-        );
+        try {
+            return generateCompleteScript(
+                data,
+                feedbackContent,
+                data.psychSafetyElements
+            );
+        } catch (error) {
+            console.error('Error generating complete script:', error);
+            return "Error generating preview. Please try again.";
+        }
     }
     
     /**
@@ -257,8 +337,12 @@ const LivePreviewManager = (function() {
      * @returns {boolean} - Whether there is minimal content
      */
     function hasMinimalContent(content) {
-        // Always show content when we have selection
-        if (FeedbackForgeState.formData.feedbackType && FeedbackForgeState.formData.feedbackModel) {
+        // Always show content when we have selection and FeedbackForgeState is available
+        if (typeof window.FeedbackForgeState !== 'undefined' && 
+            window.FeedbackForgeState && 
+            window.FeedbackForgeState.formData &&
+            window.FeedbackForgeState.formData.feedbackType && 
+            window.FeedbackForgeState.formData.feedbackModel) {
             return true;
         }
         
@@ -275,15 +359,30 @@ const LivePreviewManager = (function() {
         let content = '';
         
         if (data.situation) {
-            content += StringService.getString('modelTemplates.sbi.situation', { situation: data.situation }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.sbi.situation', { situation: data.situation }) + ' ';
+            } else {
+                content += `In the recent ${data.situation}, `;
+            }
         }
         
         if (data.behavior) {
-            content += StringService.getString('modelTemplates.sbi.behavior', { behavior: data.behavior }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.sbi.behavior', { behavior: data.behavior }) + ' ';
+            } else {
+                content += `I observed that ${data.behavior} `;
+            }
         }
         
         if (data.impact) {
-            content += StringService.getString('modelTemplates.sbi.impact', { impact: data.impact });
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.sbi.impact', { impact: data.impact });
+            } else {
+                content += `This had the following impact: ${data.impact}`;
+            }
         }
         
         return content;
@@ -298,19 +397,39 @@ const LivePreviewManager = (function() {
         let content = '';
         
         if (data.starSituation) {
-            content += StringService.getString('modelTemplates.star.situation', { situation: data.starSituation }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.star.situation', { situation: data.starSituation }) + ' ';
+            } else {
+                content += `In the context of ${data.starSituation}, `;
+            }
         }
         
         if (data.task) {
-            content += StringService.getString('modelTemplates.star.task', { task: data.task }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.star.task', { task: data.task }) + ' ';
+            } else {
+                content += `where the objective was to ${data.task}, `;
+            }
         }
         
         if (data.action) {
-            content += StringService.getString('modelTemplates.star.action', { action: data.action }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.star.action', { action: data.action }) + ' ';
+            } else {
+                content += `I observed that you ${data.action} `;
+            }
         }
         
         if (data.result) {
-            content += StringService.getString('modelTemplates.star.result', { result: data.result });
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.star.result', { result: data.result });
+            } else {
+                content += `This resulted in ${data.result}`;
+            }
         }
         
         return content;
@@ -325,21 +444,36 @@ const LivePreviewManager = (function() {
         let content = '';
         
         if (data.specificStrengths) {
-            content += StringService.getString('modelTemplates.simple.strengths', { 
-                strengths: data.specificStrengths 
-            }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.simple.strengths', { 
+                    strengths: data.specificStrengths 
+                }) + ' ';
+            } else {
+                content += `I've noticed your strengths in ${data.specificStrengths}. `;
+            }
         }
         
         if (data.areasForImprovement) {
-            content += StringService.getString('modelTemplates.simple.improvement', { 
-                improvement: data.areasForImprovement 
-            }) + ' ';
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.simple.improvement', { 
+                    improvement: data.areasForImprovement 
+                }) + ' ';
+            } else {
+                content += `I believe we can work together on ${data.areasForImprovement}. This presents an opportunity for growth and development. `;
+            }
         }
         
         if (data.supportOffered) {
-            content += StringService.getString('modelTemplates.simple.support', { 
-                support: data.supportOffered 
-            });
+            // Use StringService if available, otherwise use a template string
+            if (typeof StringService !== 'undefined' && StringService) {
+                content += StringService.getString('modelTemplates.simple.support', { 
+                    support: data.supportOffered 
+                });
+            } else {
+                content += `To support you with this, ${data.supportOffered}`;
+            }
         }
         
         return content;
@@ -353,6 +487,12 @@ const LivePreviewManager = (function() {
      * @returns {string} - Complete feedback script
      */
     function generateCompleteScript(data, contentBody, psychSafetyElements) {
+        // Ensure FeedbackGenerator is defined
+        const feedbackGenerator = window.FeedbackGenerator || {
+            getOpeningStatement: function() { return "I'm providing this feedback to help support your development."; },
+            getClosingStatement: function() { return "I welcome your thoughts on this feedback."; }
+        };
+        
         const { 
             personalityType, 
             workplaceSituation,
@@ -366,14 +506,21 @@ const LivePreviewManager = (function() {
         const today = new Date();
         const formattedDate = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth() + 1).toString().padStart(2, '0')}/${today.getFullYear()}`;
         
+        // Get string labels, falling back to defaults if StringService not available
+        const getStringLabel = (key, defaultValue) => {
+            return (typeof StringService !== 'undefined' && StringService) 
+                ? StringService.getString(key) 
+                : defaultValue;
+        };
+        
         // Start the script - use placeholders for name
-        let script = `${StringService.getString('ui.labels.feedbackFor')} [name]\n${StringService.getString('ui.labels.date')} ${formattedDate}\n\n`;
+        let script = `${getStringLabel('ui.labels.feedbackFor', 'Feedback for:')} [name]\n${getStringLabel('ui.labels.date', 'Date:')} ${formattedDate}\n\n`;
         
         // Add greeting
-        script += `${StringService.getString('ui.labels.greeting')} [name],\n\n`;
+        script += `${getStringLabel('ui.labels.greeting', 'Dear')} [name],\n\n`;
         
         // Add opening statement - use FeedbackGenerator for consistency
-        script += FeedbackGenerator.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
+        script += feedbackGenerator.getOpeningStatement(personalityType, workplaceSituation, feedbackType, tone);
         script += '\n\n';
         
         // Add main feedback content
@@ -385,16 +532,43 @@ const LivePreviewManager = (function() {
         const category = feedbackType === 'recognition' ? 'recognition' : 'other';
         
         // Add content for each selected element
-        psychSafetyElements.forEach(element => {
-            const statement = StringService.getString(
-                `feedbackTemplates.psychSafetyStatements.${category}.${element}`, 
-                null
-            );
-            
-            if (statement) {
-                psychSafetyContent += statement + ' ';
-            }
-        });
+        if (psychSafetyElements && psychSafetyElements.length > 0) {
+            psychSafetyElements.forEach(element => {
+                const key = `feedbackTemplates.psychSafetyStatements.${category}.${element}`;
+                let statement = '';
+                
+                if (typeof StringService !== 'undefined' && StringService) {
+                    statement = StringService.getString(key, null);
+                } else {
+                    // Fallback statements if StringService not available
+                    if (category === 'recognition') {
+                        if (element === 'separate-identity') {
+                            statement = "These accomplishments reflect your dedicated approach and commitment to excellence.";
+                        } else if (element === 'learning-opportunity') {
+                            statement = "Success like this creates a foundation for continued growth and development.";
+                        } else if (element === 'collaborative') {
+                            statement = "I appreciate how we've been able to work together in this area.";
+                        } else if (element === 'future-focused') {
+                            statement = "I'm looking forward to seeing how you'll build on these strengths moving forward.";
+                        }
+                    } else {
+                        if (element === 'separate-identity') {
+                            statement = "I want to emphasize that this feedback is about specific actions and outcomes, not about you as a person.";
+                        } else if (element === 'learning-opportunity') {
+                            statement = "I see this as an opportunity for learning and growth.";
+                        } else if (element === 'collaborative') {
+                            statement = "I'd like us to work together on addressing these points.";
+                        } else if (element === 'future-focused') {
+                            statement = "Let's focus on how we can move forward from here.";
+                        }
+                    }
+                }
+                
+                if (statement) {
+                    psychSafetyContent += statement + ' ';
+                }
+            });
+        }
         
         if (psychSafetyContent) {
             script += psychSafetyContent + '\n\n';
@@ -402,22 +576,36 @@ const LivePreviewManager = (function() {
         
         // Add follow-up plan if provided
         if (followUp) {
-            script += StringService.getString('feedbackTemplates.followUp', { plan: followUp }) + '\n\n';
+            const followUpTemplate = getStringLabel('feedbackTemplates.followUp', 'For follow-up, {plan}');
+            script += followUpTemplate.replace('{plan}', followUp) + '\n\n';
         }
         
         // Add delivery method specific text
         if (deliveryMethod !== 'face-to-face') {
-            const statement = StringService.getString(`deliveryMethod.${deliveryMethod}.statement`, null);
+            const key = `deliveryMethod.${deliveryMethod}.statement`;
+            let statement = '';
+            
+            if (typeof StringService !== 'undefined' && StringService) {
+                statement = StringService.getString(key, null);
+            } else {
+                // Fallbacks for delivery method statements
+                if (deliveryMethod === 'written') {
+                    statement = "I'm sharing this feedback in writing to give you time to reflect, but I'm happy to discuss it further when you're ready.";
+                } else if (deliveryMethod === 'remote') {
+                    statement = "Although we're connecting remotely, I want to ensure this feedback is as clear and supportive as if we were meeting in person.";
+                }
+            }
+            
             if (statement) {
                 script += statement + '\n\n';
             }
         }
         
         // Add closing statement - use FeedbackGenerator for consistency
-        script += FeedbackGenerator.getClosingStatement(personalityType, feedbackType);
+        script += feedbackGenerator.getClosingStatement(personalityType, feedbackType);
         
         // Add formal closing
-        script += `\n\n${StringService.getString('ui.labels.closing')}\n${StringService.getString('ui.labels.yourName')}`;
+        script += `\n\n${getStringLabel('ui.labels.closing', 'Best regards,')}\n${getStringLabel('ui.labels.yourName', '[Your Name]')}`;
         
         return script;
     }
