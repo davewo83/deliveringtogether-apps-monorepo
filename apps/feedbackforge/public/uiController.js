@@ -799,7 +799,7 @@ const UIController = (function() {
                     FeedbackForgeState.update('formData', { 
                         sbi: {
                             situation: 'the client presentation yesterday',
-                            behavior: 'you thoroughly researched the client's industry challenges and tailored your presentation to address their specific needs',
+                            behavior: 'you thoroughly researched the client\'s industry challenges and tailored your presentation to address their specific needs',
                             impact: 'the client commented on how well we understood their business and immediately approved the proposed solution'
                         }
                     });
@@ -847,7 +847,7 @@ const UIController = (function() {
                         star: {
                             situation: 'complex client projects requiring cross-team collaboration',
                             task: 'coordinate effectively with multiple departments to deliver integrated solutions',
-                            action: 'you tend to focus on your team's deliverables without proactively checking alignment with other teams',
+                            action: 'you tend to focus on your team\'s deliverables without proactively checking alignment with other teams',
                             result: 'we sometimes discover misalignments late in the process, requiring rework and creating timeline pressure'
                         }
                     });
