@@ -1,0 +1,184 @@
+/* Quality Input Styles */
+
+/* Progressive disclosure field styles */
+.hidden-field {
+    display: none;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.3s ease-out;
+}
+
+.revealing-field {
+    display: block;
+    opacity: 0;
+    max-height: 500px;
+    animation: reveal-field 0.4s ease-out forwards;
+}
+
+.active-field {
+    display: block;
+    opacity: 1;
+    max-height: 1000px;
+}
+
+@keyframes reveal-field {
+    0% {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Quality indicator styles */
+.quality-indicator-container {
+    margin-top: 8px;
+    font-size: 0.85rem;
+}
+
+.quality-bar-container {
+    height: 4px;
+    background-color: #f0f0f0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.quality-bar {
+    height: 100%;
+    background-color: #9e9e9e;
+    border-radius: 2px;
+    transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+.quality-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.quality-score {
+    font-weight: 500;
+    transition: color 0.3s ease;
+}
+
+.quality-toggle {
+    background: none;
+    border: none;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+}
+
+.quality-toggle.expanded {
+    transform: rotate(180deg);
+}
+
+.quality-suggestions {
+    background-color: #f8f9fa;
+    border-left: 3px solid #e0e0e0;
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.85rem;
+    animation: fade-in 0.3s ease;
+}
+
+.suggestion-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 6px;
+    line-height: 1.4;
+}
+
+.suggestion-item:last-child {
+    margin-bottom: 0;
+}
+
+.suggestion-item svg {
+    flex-shrink: 0;
+    margin-right: 8px;
+    margin-top: 2px;
+    color: #005a9e;
+    transform: scale(0.8);
+}
+
+/* View example button */
+.view-example-button {
+    background-color: transparent;
+    color: #005a9e;
+    border: none;
+    padding: 0;
+    font-size: 0.85rem;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.view-example-button:hover {
+    color: #004b82;
+}
+
+/* Contextual examples in modal */
+.contextual-example {
+    padding: 6px 0;
+}
+
+.contextual-example .example-box {
+    margin: 12px 0;
+    padding: 16px;
+    background-color: #f5f9ff;
+    border: 1px solid #d0e2ff;
+    border-radius: 6px;
+}
+
+.contextual-example .primary-button {
+    margin-top: 12px;
+}
+
+/* Animation for revealing content */
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Style quality indicators by quality level */
+.quality-level-empty .quality-bar {
+    background-color: #9e9e9e;
+    width: 0;
+}
+
+.quality-level-poor .quality-bar {
+    background-color: #f44336;
+}
+
+.quality-level-basic .quality-bar {
+    background-color: #ff9800;
+}
+
+.quality-level-good .quality-bar {
+    background-color: #2196f3;
+}
+
+.quality-level-excellent .quality-bar {
+    background-color: #4caf50;
+}
+
+.quality-level-outstanding .quality-bar {
+    background-color: #673ab7;
+}
