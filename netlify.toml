@@ -6,6 +6,12 @@
   force = true
 
 [[redirects]]
+  from = "/feedback/quality-input.css"
+  to = "https://feedbackforgedt.netlify.app/quality-input.css"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/feedback/feedback-generator.js"
   to = "https://feedbackforgedt.netlify.app/feedback-generator.js"
   status = 200
